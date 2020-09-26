@@ -13,7 +13,6 @@ import Types
 import Reducer (reducer)
 import Test.Values
 
-
 main :: Effect Unit
 main = runTest do
   suite "Reducer" do

@@ -12,7 +12,6 @@ type State =
     view :: View
   }
 
-
 type Puzzle = 
   { 
     name :: PuzzleName,
@@ -35,8 +34,13 @@ type Move =
 
 type Space = String -- In the format of 'a8', 'h4', 'f3', etc.
 
-data Underpromotion = Bishop | Knight | Rook
+data Underpromotion = 
+  Bishop | 
+  Knight | 
+  Rook
+
 derive instance eqUnderpromotion :: Eq Underpromotion
+
 instance showUnderpromotion :: Show Underpromotion where
   show up = case up of
     Bishop -> "Bishop"
@@ -47,7 +51,9 @@ data View =
   LoadingFile | 
   MainMenu PuzzleName FEN | 
   CreatingPuzzle
+
 derive instance eqView :: Eq View
+
 instance showView :: Show View where
   show view = case view of
     LoadingFile -> "LoadingFile"
