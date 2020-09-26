@@ -26,10 +26,14 @@ reducer state action =
     SavePuzzle ->
       state { view = MainMenu "" "" }
 
-getFEN :: State -> FEN
-getFEN state =
-  "asdf"
-
 getPuzzleName :: State -> PuzzleName
 getPuzzleName state =
-  "asdf"
+  case state.view of
+    MainMenu name _ -> name
+    _ -> ""
+
+getFEN :: State -> FEN
+getFEN state = 
+  case state.view of
+    MainMenu _ fen -> fen
+    _ -> ""

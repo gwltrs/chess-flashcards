@@ -50,7 +50,7 @@ instance showUnderpromotion :: Show Underpromotion where
 data View = 
   LoadingFile | 
   MainMenu PuzzleName FEN | 
-  CreatingPuzzle
+  CreatingPuzzle PuzzleName FEN (Maybe Move)
 
 derive instance eqView :: Eq View
 
@@ -58,7 +58,7 @@ instance showView :: Show View where
   show view = case view of
     LoadingFile -> "LoadingFile"
     MainMenu puzzleName fen -> "MainMenu " <> show puzzleName <> " " <> show fen
-    CreatingPuzzle -> "CreatingPuzzle"
+    CreatingPuzzle puzzleName fen move -> "CreatingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move
 
 data Action = 
   NewFile | 

@@ -27,7 +27,7 @@ render state =
           HH.input [ HE.onValueChange \val -> Just (UpdateFEN val) ],
           HH.button [ HE.onClick \_ -> Just CreatePuzzle ] [ HH.text "Create" ]
         ]
-    CreatingPuzzle -> 
+    CreatingPuzzle _ _ _ ->
       HH.div_
         [ 
           HH.button [ HE.onClick \_ -> Just BackToMain ] [ HH.text "Back" ],
