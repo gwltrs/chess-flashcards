@@ -47,3 +47,19 @@ main = runTest do
           (UpdatePuzzleName "OHC")
         ) 
         { puzzles: [], reviewStack: [], view: MainMenu "OHC" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" }
+
+    test "User types in the FEN field" do
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "" "" } 
+          (UpdateFEN "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -")
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" } 
+          (UpdateFEN "not real FEN")
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN" }
