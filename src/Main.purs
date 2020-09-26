@@ -11,7 +11,7 @@ import Halogen.HTML.Events as HE
 import Halogen.VDom.Driver (runUI)
 
 import Types
-import Reducer (reducer)
+import Reducer
 import Render
 
 main :: Effect Unit
