@@ -208,10 +208,10 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame ?" ohcFENWithMoveNumbers, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame ?" najdorfFENWithValidEnPassant, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" ohcFEN Nothing, alert: Nothing }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
 
     test "User closes alert box" do
 
