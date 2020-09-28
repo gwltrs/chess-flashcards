@@ -23,6 +23,8 @@ reducer state action =
       state { view = MainMenu "" "" }
     SavePuzzle ->
       state { view = MainMenu "" "" }
+    CloseAlert -> 
+      state
 
 getPuzzleName :: State -> PuzzleName
 getPuzzleName state =
