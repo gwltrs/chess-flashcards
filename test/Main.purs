@@ -1,15 +1,15 @@
 module Test.Main where
 
-import Prelude
+import Prelude (Unit, discard)
 
 import Effect (Effect)
-import Effect.Class.Console (log)
+import Data.Maybe (Maybe(..))
 
 import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types
+import Types (Action(..), FEN, View(..))
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -20,46 +20,68 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: LoadingFile } 
+          { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing } 
           NewFile
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "" }
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
 
     test "User types in the Name field" do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "" "" } 
+          { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
           (UpdatePuzzleName "Opera Hou")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "" }
+        { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "", alert: Nothing }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "" } 
+          { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "", alert: Nothing } 
           (UpdatePuzzleName "Opera House Checkmate")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" "" }
+        { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" "", alert: Nothing }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" } 
+          { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" ohcFEN, alert: Nothing } 
           (UpdatePuzzleName "OHC")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" }
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" ohcFEN, alert: Nothing }
 
     test "User types in the FEN field" do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "" "" } 
-          (UpdateFEN "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -")
+          { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
+          (UpdateFEN ohcFEN)
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" }
+        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "OHC" "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -" } 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" ohcFEN, alert: Nothing } 
           (UpdateFEN "not real FEN")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN" }
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN", alert: Nothing }
+
+    test "User navigates to the create-puzzle view" do
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+
+      -- Assert.equal 
+      --   (reducer 
+      --     { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN, alert: Nothing } 
+      --     CreatePuzzle
+      --   ) 
+      --   { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN, alert: Nothing }
+
+ohcFEN :: FEN
+ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
+
+ohcFENWithMoveNumbers :: FEN
+ohcFENWithMoveNumbers = "asdfasf"

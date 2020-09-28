@@ -1,15 +1,16 @@
 module Types where
 
-import Data.Maybe (Maybe(..))
-import Data.Eq
-import Data.Show
+import Data.Maybe (Maybe)
+import Data.Eq (class Eq)
+import Data.Show (class Show, show)
 import Data.Semigroup
 
 type State = 
   { 
     puzzles :: Array Puzzle, 
     reviewStack :: Array PuzzleName, -- Names of the puzzles that are up for review
-    view :: View
+    view :: View,
+    alert :: Maybe Alert
   }
 
 type Puzzle = 
@@ -59,6 +60,17 @@ instance showView :: Show View where
     LoadingFile -> "LoadingFile"
     MainMenu puzzleName fen -> "MainMenu " <> show puzzleName <> " " <> show fen
     CreatingPuzzle puzzleName fen move -> "CreatingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move
+
+data Alert = 
+  MissingNameOrFEN |
+  InvalidFEN
+
+derive instance eqAlert :: Eq Alert
+
+instance showAlert :: Show Alert where
+  show alert = case alert of
+    MissingNameOrFEN -> "MissingNameOrFEN"
+    InvalidFEN -> "InvalidFEN"
 
 data Action = 
   NewFile | 

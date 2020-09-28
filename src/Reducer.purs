@@ -1,8 +1,6 @@
 module Reducer where
 
-import Data.Maybe (Maybe(..))
-
-import Types
+import Types (Action(..), FEN, PuzzleName, State, View(..))
 
 reducer :: State -> Action -> State
 reducer state action =

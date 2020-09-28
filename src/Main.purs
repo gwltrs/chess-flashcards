@@ -1,18 +1,17 @@
 module Main where
 
-import Prelude
+import Prelude (Unit, bind, unit)
 
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
-import Halogen.HTML.Events as HE
 import Halogen.VDom.Driver (runUI)
 
 import Types
-import Reducer
-import Render
+import Reducer (reducer)
+import Render (render)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -29,7 +28,7 @@ component =
     }
 
 initialState :: forall i. i -> State
-initialState _ = { puzzles: [], reviewStack: [], view: LoadingFile }
+initialState _ = { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
 
 handleAction :: forall o m. Action -> H.HalogenM State Action () o m Unit
 handleAction action =

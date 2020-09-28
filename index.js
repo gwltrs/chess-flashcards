@@ -8199,10 +8199,18 @@ var PS = {};
       return MainMenu;
   })();
   var CreatingPuzzle = (function () {
-      function CreatingPuzzle() {
-
+      function CreatingPuzzle(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
       };
-      CreatingPuzzle.value = new CreatingPuzzle();
+      CreatingPuzzle.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new CreatingPuzzle(value0, value1, value2);
+              };
+          };
+      };
       return CreatingPuzzle;
   })();
   var NewFile = (function () {

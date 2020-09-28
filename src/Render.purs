@@ -5,7 +5,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Data.Maybe (Maybe(..))
 
-import Types
+import Types (Action(..), State, View(..))
   
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
