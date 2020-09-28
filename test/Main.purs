@@ -9,7 +9,7 @@ import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types (Action(..), FEN, View(..))
+import Types (Action(..), FEN, View(..), Alert(..))
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -64,21 +64,42 @@ main = runTest do
         ) 
         { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN", alert: Nothing }
 
-    test "User navigates to the create-puzzle view" do
+    test "User tries to create puzzle with empty field(s)" do
 
       Assert.equal 
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
 
-      -- Assert.equal 
-      --   (reducer 
-      --     { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN, alert: Nothing } 
-      --     CreatePuzzle
-      --   ) 
-      --   { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN, alert: Nothing }
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Nothing } 
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Nothing } -- Should check for length after trimming
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Nothing } -- Should check for length after trimming
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
