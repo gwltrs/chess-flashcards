@@ -78,31 +78,53 @@ main = runTest do
           { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Just MissingNameOrFEN }
 
       Assert.equal 
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Nothing } 
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Just MissingNameOrFEN }
 
       Assert.equal 
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Nothing } -- Should check for length after trimming
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+        { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Just MissingNameOrFEN }
 
       Assert.equal 
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Nothing } -- Should check for length after trimming
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Just MissingNameOrFEN }
+
+    test "User tries to create puzzle with invalid FEN" do
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseMissingInfo, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseMissingInfo, alert: Just InvalidFEN }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
 
 ohcFENWithMoveNumbers :: FEN
 ohcFENWithMoveNumbers = "asdfasf"
+
+invalidFENBecauseMissingInfo :: FEN
+invalidFENBecauseMissingInfo = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4"
+
+invalidFENBecauseNoWhiteKing :: FEN 
+invalidFENBecauseNoWhiteKing = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2R4 w k -"
