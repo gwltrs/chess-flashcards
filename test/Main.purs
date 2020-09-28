@@ -122,14 +122,14 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Just DuplicateName }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
@@ -138,14 +138,14 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Just DuplicateFEN }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "new endgame" endgamePuzzle2.fen, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle2.fen, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
@@ -174,7 +174,7 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "OHC" (" " <> ohcFEN <> "  "), alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "OHC" (" " <> ohcFEN <> "  "), alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
@@ -188,7 +188,7 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
@@ -202,14 +202,14 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu " checkmate pattern ? " ohcFENWithMoveNumbers, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " checkmate pattern ? " ohcFENWithMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "checkmate pattern 1" ohcFEN Nothing, alert: Nothing }
 
       Assert.equal 
         (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "endgame ?" ohcFENWithMoveNumbers, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame ?" ohcFENWithMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" ohcFEN Nothing, alert: Nothing }
