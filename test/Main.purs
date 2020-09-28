@@ -134,13 +134,6 @@ main = runTest do
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
 
-      Assert.equal 
-        (reducer 
-          { puzzles: [], reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Nothing } -- Duplicate name check should happen before duplicate FEN check
-          CreatePuzzle
-        ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
-
     test "User tries to create puzzle with duplicate fen" do
 
       Assert.equal 
@@ -156,6 +149,18 @@ main = runTest do
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
+
+    test "User tries to create puzzle with duplicate name and FEN" do
+
+      -- Duplicate name check should happen before duplicate FEN check
+
+      Assert.equal 
+        (reducer 
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
+
 
     test "User navigates to create-puzzle view" do
 
