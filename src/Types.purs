@@ -18,8 +18,8 @@ type Puzzle =
     name :: PuzzleName,
     fen :: FEN,
     move :: Move,
-    box :: Int,
-    lastDrilledAt :: Int
+    box :: Days,
+    lastDrilledAt :: Seconds
   }
 
 type PuzzleName = String
@@ -32,6 +32,10 @@ type Move =
     to :: Space,
     underpromotion :: Maybe Underpromotion
   }
+
+type Days = Int
+
+type Seconds = Int
 
 type Space = String -- In the format of 'a8', 'h4', 'f3', etc.
 

@@ -10,7 +10,7 @@ import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types (Action(..), FEN, View(..), Alert(..), Puzzle)
+import Types (Action(..), FEN, View(..), Alert(..), Puzzle, Underpromotion(..))
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -133,7 +133,7 @@ main = runTest do
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" (" " <> ohcFEN <> "  "), alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
 
       Assert.equal 
         (reducer 
@@ -147,7 +147,7 @@ main = runTest do
           { puzzles: [], reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
 
       Assert.equal 
         (reducer 
@@ -155,6 +155,20 @@ main = runTest do
           CreatePuzzle
         ) 
         { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu " checkmate pattern ? " ohcFENWithMoveNumbers, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "checkmate pattern 1" ohcFEN Nothing, alert: Nothing }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "endgame ?" ohcFENWithMoveNumbers, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" ohcFEN Nothing, alert: Nothing }
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
@@ -177,12 +191,33 @@ openGameFEN = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"
 najdorfFENWithValidEnPassant :: FEN
 najdorfFENWithValidEnPassant = "r2q1rk1/3nb1pp/p2p4/1p1PppPn/8/1N2BP2/PPPQ3P/2KR1B1R w - f6"
 
-twoEndgamePuzzles :: Array Puzzle
-twoEndgamePuzzles = [
-  {
-
-  },
-  {
-    
+endgamePuzzle1 :: Puzzle
+endgamePuzzle1 = 
+  { 
+    name: "endgame 1",
+    fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
+    move: {
+      from: "d7",
+      to: "d8",
+      underpromotion: Just Knight
+    },
+    box: 2,
+    lastDrilledAt: 1601324525
   }
-]
+
+endgamePuzzle2 :: Puzzle
+endgamePuzzle2 = 
+  { 
+    name: "endgame 2",
+    fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
+    move: {
+      from: "g6",
+      to: "g7",
+      underpromotion: Nothing
+    },
+    box: 4,
+    lastDrilledAt: 1601324534
+  }
+
+twoEndgamePuzzles :: Array Puzzle
+twoEndgamePuzzles = [endgamePuzzle1, endgamePuzzle2]
