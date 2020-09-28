@@ -118,6 +118,22 @@ main = runTest do
         ) 
         { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
 
+    test "User tries to create puzzle with duplicate name" do
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Just DuplicateName }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
+          CreatePuzzle
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
+
     test "User navigates to create-puzzle view" do
 
       -- Both the puzzle name and FEN should be trimmed

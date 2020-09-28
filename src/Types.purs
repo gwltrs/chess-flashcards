@@ -67,7 +67,9 @@ instance showView :: Show View where
 
 data Alert = 
   MissingNameOrFEN |
-  InvalidFEN
+  InvalidFEN | 
+  DuplicateName |
+  DuplicateFEN
 
 derive instance eqAlert :: Eq Alert
 
@@ -75,6 +77,8 @@ instance showAlert :: Show Alert where
   show alert = case alert of
     MissingNameOrFEN -> "MissingNameOrFEN"
     InvalidFEN -> "InvalidFEN"
+    DuplicateName -> "DuplicateName"
+    DuplicateFEN -> "DuplicateFEN"
 
 data Action = 
   NewFile | 
