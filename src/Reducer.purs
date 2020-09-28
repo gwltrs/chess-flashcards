@@ -1,6 +1,7 @@
 module Reducer where
 
 import Types (Action(..), FEN, PuzzleName, State, View(..))
+import Data.Maybe (Maybe(..))
 
 reducer :: State -> Action -> State
 reducer state action =
@@ -24,7 +25,7 @@ reducer state action =
     SavePuzzle ->
       state { view = MainMenu "" "" }
     CloseAlert -> 
-      state
+      state { alert = Nothing }
 
 getPuzzleName :: State -> PuzzleName
 getPuzzleName state =
