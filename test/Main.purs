@@ -132,7 +132,7 @@ main = runTest do
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
 
     test "User tries to create puzzle with duplicate fen" do
 
@@ -145,7 +145,7 @@ main = runTest do
 
       Assert.equal 
         (reducer 
-          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle2.fen, alert: Nothing }
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Nothing }
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
