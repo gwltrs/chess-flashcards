@@ -4,12 +4,13 @@ import Prelude (Unit, discard)
 
 import Effect (Effect)
 import Data.Maybe (Maybe(..))
+import Data.Semigroup ((<>))
 
 import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types (Action(..), FEN, View(..), Alert(..))
+import Types (Action(..), FEN, View(..), Alert(..), Puzzle)
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -117,14 +118,71 @@ main = runTest do
         ) 
         { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
 
+    test "User navigates to create-puzzle view" do
+
+      -- Both the puzzle name and FEN should be trimmed
+      -- Move numbers from FEN should be stripped
+      -- Unnecessary en passant info in FEN should be replaced with "-"
+      -- Puzzle name "incrementing" feature
+      --   This allows the user to name the puzzle with a description and an auto-increment number without having to remember the previous number
+      --   "checkmate pattern ?" -> "checkmate pattern 1" if no puzzles already exist
+      --   "endgame ?" -> "endgame 3" if two puzzles already exist with the names "endgame 1" and "endgame 2"
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" (" " <> ohcFEN <> "  "), alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "OHC" (" " <> ohcFENWithMoveNumbers), alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
 
 ohcFENWithMoveNumbers :: FEN
-ohcFENWithMoveNumbers = "asdfasf"
+ohcFENWithMoveNumbers = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16"
 
 invalidFENBecauseMissingInfo :: FEN
 invalidFENBecauseMissingInfo = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4"
 
 invalidFENBecauseNoWhiteKing :: FEN 
 invalidFENBecauseNoWhiteKing = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2R4 w k -"
+
+openGameFENWithEnPassantAndMoveNumbers :: FEN
+openGameFENWithEnPassantAndMoveNumbers = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"
+
+openGameFEN :: FEN
+openGameFEN = "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"
+
+najdorfFENWithValidEnPassant :: FEN
+najdorfFENWithValidEnPassant = "r2q1rk1/3nb1pp/p2p4/1p1PppPn/8/1N2BP2/PPPQ3P/2KR1B1R w - f6"
+
+twoEndgamePuzzles :: Array Puzzle
+twoEndgamePuzzles = [
+  {
+
+  },
+  {
+    
+  }
+]

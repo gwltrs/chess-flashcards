@@ -3,7 +3,7 @@ module Types where
 import Data.Maybe (Maybe)
 import Data.Eq (class Eq)
 import Data.Show (class Show, show)
-import Data.Semigroup
+import Data.Semigroup ((<>))
 
 type State = 
   { 
