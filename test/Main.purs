@@ -161,7 +161,6 @@ main = runTest do
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
 
-
     test "User navigates to create-puzzle view" do
 
       -- Both the puzzle name and FEN should be trimmed
@@ -213,6 +212,15 @@ main = runTest do
           CreatePuzzle
         ) 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" ohcFEN Nothing, alert: Nothing }
+
+    test "User closes alert box" do
+
+      Assert.equal 
+        (reducer 
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Just DuplicateName }
+          CloseAlert
+        ) 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Nothing }
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"

@@ -89,4 +89,5 @@ data Action =
   UpdateFEN FEN |
   CreatePuzzle | 
   BackToMain |
-  SavePuzzle
+  SavePuzzle |
+  CloseAlert
