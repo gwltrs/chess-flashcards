@@ -5,36 +5,20 @@ import Data.Maybe (Maybe(..))
 
 reducer :: State -> Action -> State
 reducer state action =
-  case action of
-    NewFile ->
+  case { act: action, vw: state.view } of
+    { act: NewFile, vw: _ } ->
       state { view = MainMenu "" "" }
-    LoadFile ->
+    { act: LoadFile, vw: _ } ->
       state { view = MainMenu "" "" }
-    SaveFile ->
+    { act: UpdatePuzzleName newName, vw: MainMenu _ currentFEN } ->
+      state { view = MainMenu newName currentFEN }
+    { act: UpdateFEN newFEN, vw: MainMenu currentName _ }  ->
+      state { view = MainMenu currentName newFEN }
+    { act: CreatePuzzle, vw: _ } ->
       state
-    Review ->
-      state
-    UpdatePuzzleName puzzleName ->
-      state { view = MainMenu puzzleName (getFEN state) }
-    UpdateFEN fen ->
-      state { view = MainMenu (getPuzzleName state) fen }
-    CreatePuzzle ->
-      state
-    BackToMain ->
+    { act: BackToMain, vw: _ } ->
       state { view = MainMenu "" "" }
-    SavePuzzle ->
-      state { view = MainMenu "" "" }
-    CloseAlert -> 
+    { act: CloseAlert, vw: _ } -> 
       state { alert = Nothing }
-
-getPuzzleName :: State -> PuzzleName
-getPuzzleName state =
-  case state.view of
-    MainMenu name _ -> name
-    _ -> ""
-
-getFEN :: State -> FEN
-getFEN state = 
-  case state.view of
-    MainMenu _ fen -> fen
-    _ -> ""
+    { act: _, vw: _ } ->
+      state
