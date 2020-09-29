@@ -24,11 +24,9 @@ reducer state action =
         trimmedName = trim name
         trimmedFEN = trim fen
       in
-        if (length trimmedName) == 0 || (length trimmedFEN) == 0
-        then
+        if (length trimmedName) == 0 || (length trimmedFEN) == 0 then
           state { alert = Just MissingNameOrFEN }
-        else if not (fenIsValid fen)
-        then 
+        else if not (fenIsValid fen) then 
           state { alert = Just InvalidFEN }
         else 
           state
