@@ -1,9 +1,12 @@
 module Reducer where
 
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
+import Data.Array (elemIndex)
+import Data.Function ((#))
+import Data.Functor (map)
 
 import Types (Action(..), FEN, PuzzleName, State, View(..), Alert(..))
 import Chess (fenIsValid)
@@ -28,7 +31,9 @@ reducer state action =
           state { alert = Just MissingNameOrFEN }
         else if not (fenIsValid fen) then 
           state { alert = Just InvalidFEN }
-        else 
+        else if state.puzzles # (map \p -> p.name) # elemIndex trimmedName # isJust then
+          state { alert = Just DuplicateName }
+        else
           state
       
     { act: BackToMain, vw: _ } ->
