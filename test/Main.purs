@@ -20,153 +20,153 @@ main = runTest do
     test "User creates New file" do
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing } 
           NewFile
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
 
     test "User types in the Name field" do
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "", alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
           (UpdatePuzzleName "Opera Hou")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "", alert: Nothing }
-
+        
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" "", alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "Opera Hou" "", alert: Nothing } 
           (UpdatePuzzleName "Opera House Checkmate")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" "", alert: Nothing }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" ohcFEN, alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "Opera House Checkmate" ohcFEN, alert: Nothing } 
           (UpdatePuzzleName "OHC")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" ohcFEN, alert: Nothing }
 
     test "User types in the FEN field" do
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
           (UpdateFEN ohcFEN)
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN", alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" ohcFEN, alert: Nothing } 
           (UpdateFEN "not real FEN")
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "not real FEN", alert: Nothing }
 
     test "User tries to create puzzle with empty field(s)" do
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing } 
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Just MissingNameOrFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Just MissingNameOrFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "" ohcFEN, alert: Just MissingNameOrFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Just MissingNameOrFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Nothing } 
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "", alert: Just MissingNameOrFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Just MissingNameOrFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Nothing } -- Should check for length after trimming
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu " " ohcFEN, alert: Just MissingNameOrFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Just MissingNameOrFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Nothing } -- Should check for length after trimming
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" "   ", alert: Just MissingNameOrFEN }
 
     test "User tries to create puzzle with invalid FEN" do
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseMissingInfo, alert: Just InvalidFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseMissingInfo, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseMissingInfo, alert: Just InvalidFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: MainMenu "complete garbage" "asdlfkj9p34@#$%WEGWG", alert: Just InvalidFEN }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "complete garbage" "asdlfkj9p34@#$%WEGWG", alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: MainMenu "complete garbage" "asdlfkj9p34@#$%WEGWG", alert: Just InvalidFEN }
 
     test "User tries to create puzzle with duplicate name" do
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Just DuplicateName }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Just DuplicateName }
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
 
     test "User tries to create puzzle with duplicate fen" do
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Just DuplicateFEN }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Just DuplicateFEN }
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
 
     test "User tries to create puzzle with duplicate name and FEN" do
 
       -- Duplicate name check should happen before duplicate FEN check
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
 
     test "User navigates to create-puzzle view" do
 
@@ -178,56 +178,56 @@ main = runTest do
       --   "checkmate pattern ?" -> "checkmate pattern 1" if no puzzles already exist
       --   "endgame ?" -> "endgame 3" if two puzzles already exist with the names "endgame 1" and "endgame 2"
 
-      Assert.equal 
+      Assert.equal
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "OHC" (" " <> ohcFEN <> "  "), alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "OHC" (" " <> ohcFENWithMoveNumbers), alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
 
       Assert.equal 
+        { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
         (reducer 
           { puzzles: [], reviewStack: [], view: MainMenu "   Open Game " openGameFENWithEnPassantAndMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: [], reviewStack: [], view: CreatingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "checkmate pattern 1" ohcFEN Nothing, alert: Nothing }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " checkmate pattern ? " ohcFENWithMoveNumbers, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "checkmate pattern 1" ohcFEN Nothing, alert: Nothing }
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame ?" najdorfFENWithValidEnPassant, alert: Nothing }
           CreatePuzzle
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
 
     test "User closes alert box" do
 
       Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Nothing }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Just DuplicateName }
           CloseAlert
         ) 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Nothing }
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
