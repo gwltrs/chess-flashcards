@@ -5,8 +5,12 @@ exports.fenIsValid = function(fen) {
    * Here we need a wrapper for the chess.js logic since even the FEN-validation 
    * will throw an exception if not given the right format
    */
-  let obj = (new Chess()).validate_fen(toChessJSFEN(fen));
-  return obj.valid;
+  try {
+    let obj = (new Chess()).validate_fen(toChessJSFEN(fen));
+    return obj.valid;
+  } catch (err) {
+    return false;
+  }
 };
 
 function numberOfSpaces(str) {
