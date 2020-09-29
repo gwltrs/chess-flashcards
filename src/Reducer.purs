@@ -33,6 +33,8 @@ reducer state action =
           state { alert = Just InvalidFEN }
         else if state.puzzles # (map \p -> p.name) # elemIndex trimmedName # isJust then
           state { alert = Just DuplicateName }
+        else if state.puzzles # (map \p -> p.fen) # elemIndex trimmedFEN # isJust then
+          state { alert = Just DuplicateFEN }
         else
           state
       

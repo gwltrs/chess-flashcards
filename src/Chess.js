@@ -6,7 +6,7 @@ exports.fenIsValid = function(fen) {
    * will throw an exception if not given the right format
    */
   try {
-    let obj = (new Chess()).validate_fen(toChessJSFEN(fen));
+    let obj = (new Chess()).validate_fen(toChessJSFEN(fen.trim()));
     return obj.valid;
   } catch (err) {
     return false;
