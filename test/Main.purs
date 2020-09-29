@@ -118,6 +118,13 @@ main = runTest do
         ) 
         { puzzles: [], reviewStack: [], view: MainMenu "OHC" invalidFENBecauseNoWhiteKing, alert: Just InvalidFEN }
 
+      Assert.equal 
+        (reducer 
+          { puzzles: [], reviewStack: [], view: MainMenu "complete garbage" "asdlfkj9p34@#$%WEGWG", alert: Nothing }
+          CreatePuzzle
+        ) 
+        { puzzles: [], reviewStack: [], view: MainMenu "complete garbage" "asdlfkj9p34@#$%WEGWG", alert: Just InvalidFEN }
+
     test "User tries to create puzzle with duplicate name" do
 
       Assert.equal 
