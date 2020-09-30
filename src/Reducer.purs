@@ -4,12 +4,23 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
-import Data.Array (elemIndex)
+import Data.Array (elemIndex, filter, mapMaybe)
+import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
+import Data.String.Regex (regex, match)
+import Data.String.Regex.Flags (RegexFlags(..))
+import Data.Either (fromRight)
+import Partial.Unsafe (unsafePartial)
+import Data.Int (fromString)
+import Data.Foldable (foldr)
+import Data.Ord (max)
+import Data.Show (show)
+import Data.Semigroup ((<>))
+import Data.Semiring (add)
 
-import Types (Action(..), FEN, PuzzleName, State, View(..), Alert(..))
-import Chess (fenIsValid)
+import Types (Action(..), Alert(..), Puzzle, State, View(..))
+import Chess (fenIsValid, sanitizeFEN)
 
 reducer :: State -> Action -> State
 reducer state action =
@@ -36,11 +47,41 @@ reducer state action =
         else if state.puzzles # (map \p -> p.fen) # elemIndex trimmedFEN # isJust then
           state { alert = Just DuplicateFEN }
         else
-          state
-      
+          state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) (sanitizeFEN trimmedFEN) Nothing }
     { act: BackToMain, vw: _ } ->
       state { view = MainMenu "" "" }
     { act: CloseAlert, vw: _ } -> 
       state { alert = Nothing }
     { act: _, vw: _ } ->
       state
+
+-- Assumes the name is already trimmed at this point
+incrementName :: Array Puzzle -> String -> String
+incrementName puzzles name = 
+  let 
+    flags = RegexFlags { global: false, ignoreCase: false, multiline: true, sticky: false, unicode: false }
+    nameRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+\\?$" flags))
+    nameMatch = match nameRegex name
+    puzzlesRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+([1-9][0-9]*)$" flags))
+    puzzleMatches = 
+      puzzles 
+        # (map \p -> p.name) 
+        # (mapMaybe (match puzzlesRegex))
+        # (mapMaybe \nonEmptyArr -> 
+            case toArray nonEmptyArr of
+              [Just _, Just nameString, Just intString] ->
+                fromString intString # (map \parsedInt -> { name: nameString, int: parsedInt })
+              _ -> 
+                Nothing
+          )
+  in
+    case nameMatch # map toArray of
+      Just [Just _, Just nameWithQuestionMark] -> 
+        nameWithQuestionMark <> " " <> (currentIncrement # add 1 # show)
+          where
+            currentIncrement = puzzleMatches
+              # (filter \match -> match.name == nameWithQuestionMark)
+              # (map \m -> m.int)
+              # (foldr max 0)
+      _ -> 
+        name

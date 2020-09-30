@@ -1,6 +1,6 @@
 "use strict";
 
-exports.fenIsValid = function(fen) {
+exports.fenIsValid = (fen) => {
   /*
    * Here we need a wrapper for the chess.js logic since even the FEN-validation 
    * will throw an exception if not given the right format
@@ -13,7 +13,15 @@ exports.fenIsValid = function(fen) {
   }
 };
 
-function numberOfSpaces(str) {
+exports.sanitizeFEN = (fen) => {
+  /*
+   * Removes move numbers and unnecessary en passant info
+   * Behavior is undefined when fenIsValid(fen) === false
+   */
+  return removeMoveNumberFromFEN(removeUnnecessaryEnPassantFromFEN(fen));
+};
+
+const numberOfSpaces = (str) => {
   var string = str,
   searchFor = ' ',
   count = 0,
@@ -23,11 +31,11 @@ function numberOfSpaces(str) {
       pos = string.indexOf(searchFor, ++pos);
   }
   return count;
-};
+}
 
-function toChessJSFEN(fen) {
-  const FEN_CASTLE_ENPASSANT_MOVE_SUFFIX = " - - 1 1"
-  const FEN_MOVE_SUFFIX = " 1 1"
+const toChessJSFEN = (fen) => {
+  const FEN_CASTLE_ENPASSANT_MOVE_SUFFIX = " - - 1 1";
+  const FEN_MOVE_SUFFIX = " 1 1";
   const numSpaces = numberOfSpaces(fen);
   if (numSpaces === 5) {
       return fen;
@@ -36,7 +44,36 @@ function toChessJSFEN(fen) {
   } else if (numSpaces === 1) {
       return fen + FEN_CASTLE_ENPASSANT_MOVE_SUFFIX;
   }
-};
+}
+
+const removeEnPassantDataFromFEN = (fen) => {
+  return fen.replace(/ [a-h][36]/, " -");
+}
+
+const removeUnnecessaryEnPassantFromFEN = (fen) => {
+  if (enPassantIsPossible(fen)) {
+    return fen;
+  } else {
+    return removeEnPassantDataFromFEN(fen);
+  }
+}
+
+const enPassantIsPossible = (rawFEN) => {
+  const fenWithoutEnPassant = removeEnPassantDataFromFEN(rawFEN);
+  const rawGame = Chess(toChessJSFEN(rawFEN));
+  const noEnPassantGame = Chess(toChessJSFEN(fenWithoutEnPassant));
+  return rawGame.moves().length > noEnPassantGame.moves().length;
+}
+
+const removeMoveNumberFromFEN = (fen) => {
+  let regexToRemove = / \d+ \d+$/;
+  let result = regexToRemove.exec(fen);
+  if (result === null) {
+    return fen;
+  } else {
+    return fen.substring(0, result.index);
+  }
+}
 
 /*
  * Copyright (c) 2020, Jeff Hlywa (jhlywa@gmail.com)
