@@ -1,0 +1,21 @@
+body {
+  background-color: rgb(100, 180, 95);
+}
+  
+.menuButton {
+  background-color: rgb(255, 255, 255);
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  width: 100pt;
+  height: 25pt;
+  margin: 2pt;
+}
+
+.textField {
+  width: 150pt;
+  height: 19pt;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 11pt;
+  text-align: center;
+  border: 1.5pt solid black;
+  margin: 2pt;
+}

@@ -3,6 +3,8 @@ module Render where
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
+import Halogen.HTML.Core as HC
 import Data.Maybe (Maybe(..), isJust)
 
 import Types (Action(..), State, View(..))
@@ -18,25 +20,25 @@ render state =
         LoadingFile -> 
           HH.div_
             [ 
-              HH.button [ HE.onClick \_ -> Just NewFile ] [ HH.text "New" ],
-              HH.button [ HE.onClick \_ -> Just LoadFile ] [ HH.text "Load" ]
+              menuButton "New" NewFile,
+              menuButton "Load" LoadFile
             ]
         MainMenu _ _ -> 
           HH.div_
             [ 
-              HH.button [ HE.onClick \_ -> Just SaveFile ] [ HH.text "Save" ],
+              menuButton "Save" SaveFile,
               HH.br_,
-              HH.button [ HE.onClick \_ -> Just Review ] [ HH.text "Review" ],
+              menuButton "Review" Review,
               HH.br_,
-              HH.input [ HE.onValueChange \val -> Just (UpdatePuzzleName val) ],
-              HH.input [ HE.onValueChange \val -> Just (UpdateFEN val) ],
-              HH.button [ HE.onClick \_ -> Just CreatePuzzle ] [ HH.text "Create" ]
+              HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdatePuzzleName val) ],
+              HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdateFEN val) ],
+              menuButton "Create" CreatePuzzle
             ]
         CreatingPuzzle _ _ _ ->
           HH.div_
             [ 
-              HH.button [ HE.onClick \_ -> Just BackToMain ] [ HH.text "Back" ],
-              HH.button [ HE.onClick \_ -> Just SavePuzzle ] [ HH.text "Save" ]
+              menuButton "Back" BackToMain,
+              menuButton "Save" SavePuzzle
             ]
 
     alertDiv :: H.ComponentHTML Action () m
@@ -48,3 +50,13 @@ render state =
   in 
   
     HH.div_ [contentDiv, alertDiv]
+
+menuButton text action = 
+  HH.button 
+    [ 
+      HP.class_ (HC.ClassName "menuButton"), 
+      HE.onClick \_ -> Just action
+    ] 
+    [ 
+      HH.text text
+    ]
