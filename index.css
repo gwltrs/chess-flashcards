@@ -19,3 +19,45 @@ body {
   border: 1.5pt solid black;
   margin: 2pt;
 }
+
+.modalBackground {
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modalContent {
+  background-color: #fefefe;
+  border: 1px solid #888;
+  position: fixed;
+  width: 200pt;
+  height: 75pt;
+  top: 50pt;
+  left: 75pt;
+}
+
+.closeButton {
+  background-color: rgb(255, 255, 255);
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  width: 50pt;
+  height: 20pt;
+  position: fixed;
+  top: 57pt;
+  left: 220pt;
+}
+
+.alertText {
+  position: fixed;
+  width: 200pt;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 11pt;
+  text-align: center;
+  top: 92pt;
+}

@@ -5,9 +5,11 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Core as HC
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(..), isJust, fromMaybe)
+import Data.Function ((#))
+import Data.Functor (map)
 
-import Types (Action(..), State, View(..))
+import Types (Action(..), State, View(..), Alert(..))
   
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
@@ -43,14 +45,37 @@ render state =
 
     alertDiv :: H.ComponentHTML Action () m
     alertDiv = 
-      if isJust state.alert 
-      then HH.div_ [ HH.button [ HE.onClick \_ -> Just CloseAlert ] [ HH.text "Close" ] ] 
-      else HH.div_ []
+      if isJust state.alert
+      then 
+        HH.div
+          [
+            HP.class_ (HC.ClassName "modalBackground")
+          ]
+          [ 
+            HH.div
+              [
+                HP.class_ (HC.ClassName "modalContent")
+              ]
+              [ 
+                HH.button 
+                  [ 
+                    HE.onClick \_ -> Just CloseAlert,
+                    HP.class_ (HC.ClassName "closeButton")
+                  ]
+                  [ HH.text "Close" ],
+                HH.span
+                  [ HP.class_ (HC.ClassName "alertText") ]
+                  [ state.alert # map alertText # fromMaybe "" # HH.text ]
+              ] 
+          ] 
+      else 
+        HH.div_ []
 
   in 
   
     HH.div_ [contentDiv, alertDiv]
 
+menuButton :: forall w i. String -> w -> HC.HTML i w
 menuButton text action = 
   HH.button 
     [ 
@@ -60,3 +85,10 @@ menuButton text action =
     [ 
       HH.text text
     ]
+
+alertText :: Alert -> String
+alertText = case _ of
+  MissingNameOrFEN -> "Missing name or FEN"
+  InvalidFEN -> "Invalid FEN"
+  DuplicateName -> "Duplicate name"
+  DuplicateFEN -> "Duplicate FEN"

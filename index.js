@@ -10429,7 +10429,8 @@ var PS = {};
   var element = Halogen_HTML_Core.element(Data_Maybe.Nothing.value);
   var input = function (props) {
       return element("input")(props)([  ]);
-  };                 
+  };
+  var span = element("span");
   var div = element("div");
   var div_ = div([  ]);
   var button = element("button");
@@ -10439,8 +10440,10 @@ var PS = {};
   var br_ = br([  ]);
   exports["br_"] = br_;
   exports["button"] = button;
+  exports["div"] = div;
   exports["div_"] = div_;
   exports["input"] = input;
+  exports["span"] = span;
 })(PS);
 (function(exports) {
   "use strict";
@@ -11444,6 +11447,7 @@ var PS = {};
   "use strict";
   $PS["Render"] = $PS["Render"] || {};
   var exports = $PS["Render"];
+  var Data_Functor = $PS["Data.Functor"];
   var Data_Maybe = $PS["Data.Maybe"];
   var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
   var Halogen_HTML_Elements = $PS["Halogen.HTML.Elements"];
@@ -11456,6 +11460,21 @@ var PS = {};
               return new Data_Maybe.Just(action);
           }) ])([ Halogen_HTML_Core.text(text) ]);
       };
+  };
+  var alertText = function (v) {
+      if (v instanceof Types.MissingNameOrFEN) {
+          return "Missing name or FEN";
+      };
+      if (v instanceof Types.InvalidFEN) {
+          return "Invalid FEN";
+      };
+      if (v instanceof Types.DuplicateName) {
+          return "Duplicate name";
+      };
+      if (v instanceof Types.DuplicateFEN) {
+          return "Duplicate FEN";
+      };
+      throw new Error("Failed pattern match at Render (line 90, column 13 - line 94, column 34): " + [ v.constructor.name ]);
   };
   var render = function (state) {
       var contentDiv = (function () {
@@ -11472,14 +11491,14 @@ var PS = {};
           if (state.view instanceof Types.CreatingPuzzle) {
               return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value), menuButton("Save")(Types.SavePuzzle.value) ]);
           };
-          throw new Error("Failed pattern match at Render (line 19, column 7 - line 42, column 14): " + [ state.view.constructor.name ]);
+          throw new Error("Failed pattern match at Render (line 21, column 7 - line 44, column 14): " + [ state.view.constructor.name ]);
       })();
       var alertDiv = (function () {
-          var $8 = Data_Maybe.isJust(state.alert);
-          if ($8) {
-              return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(function (v) {
+          var $10 = Data_Maybe.isJust(state.alert);
+          if ($10) {
+              return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("modalBackground") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("modalContent") ])([ Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(function (v) {
                   return new Data_Maybe.Just(Types.CloseAlert.value);
-              }) ])([ Halogen_HTML_Core.text("Close") ]) ]);
+              }), Halogen_HTML_Properties.class_("closeButton") ])([ Halogen_HTML_Core.text("Close") ]), Halogen_HTML_Elements.span([ Halogen_HTML_Properties.class_("alertText") ])([ Halogen_HTML_Core.text(Data_Maybe.fromMaybe("")(Data_Functor.map(Data_Maybe.functorMaybe)(alertText)(state.alert))) ]) ]) ]);
           };
           return Halogen_HTML_Elements.div_([  ]);
       })();
