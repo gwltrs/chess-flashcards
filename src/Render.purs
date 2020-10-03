@@ -12,9 +12,8 @@ import Data.Functor (map)
 import Types (Action(..), State, View(..), Alert(..))
   
 render :: forall m. State -> H.ComponentHTML Action () m
-render state =
-
-  let 
+render state = HH.div_ [contentDiv, alertDiv]
+  where 
 
     contentDiv :: H.ComponentHTML Action () m
     contentDiv = 
@@ -42,7 +41,7 @@ render state =
               menuButton "Back" BackToMain,
               menuButton "Save" SavePuzzle
             ]
-
+            
     alertDiv :: H.ComponentHTML Action () m
     alertDiv = 
       if isJust state.alert
@@ -71,9 +70,6 @@ render state =
       else 
         HH.div_ []
 
-  in 
-  
-    HH.div_ [contentDiv, alertDiv]
 
 menuButton :: forall w i. String -> w -> HC.HTML i w
 menuButton text action = 
