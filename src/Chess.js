@@ -21,6 +21,67 @@ exports.sanitizeFEN = (fen) => {
   return removeMoveNumberFromFEN(removeUnnecessaryEnPassantFromFEN(fen));
 };
 
+exports.getMoveImpl = (fen) => {
+
+  console.log('got fen', fen);
+
+  return function() {
+    console.log('inner called');
+    return new Promise((res, rej) => {
+
+      let hasMoved = false;
+      const game = new Chess(toChessJSFEN(fen));
+
+      const board = ChessBoard('chessboard', {
+        position: fen,
+        draggable: true,
+        onDragStart: (source, piece, position, orientation) => {
+          if (hasMoved || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+              return false;
+          }
+        },
+        onDrop: (source, target) => {
+          hasMoved = true;
+          res('boooom!');
+            // const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, derivedState.game);
+            // const moveString = stringMoveFromObjectMove(moveObject);
+            // const move = derivedState.game.move(moveObject);
+            // if (move === null) {
+            //     return 'snapback';
+            // } else {
+            //     delay(5, () => { 
+            //         derivedState.board.position(derivedState.game.fen());
+            //         state.moveStringJustMade = moveString;
+            //         if (state.drillTitle === null) {
+            //             graySquare(moveObject.from);
+            //             graySquare(moveObject.to);
+            //         } else {
+            //             const drillMove = state.data.find(p => p.title === state.drillTitle).move;
+            //             if (moveString === drillMove) {
+            //                 greenSquare(moveObject.to);
+            //                 if (state.isFirstTry) {
+            //                     updateStateForDrillSuccess();
+            //                     state.isFirstTry = false;
+            //                 }
+            //             } else {
+            //                 redSquare(moveObject.to);
+            //                 if (state.isFirstTry) {
+            //                     updateStateForDrillFailure();
+            //                     state.isFirstTry = false;
+            //                 }
+            //             }
+            //         }
+            //     });
+            // }
+            
+        }
+      });
+    });
+
+  };
+  
+};
+
 const numberOfSpaces = (str) => {
   var string = str,
   searchFor = ' ',

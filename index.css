@@ -61,3 +61,7 @@ body {
   text-align: center;
   top: 92pt;
 }
+
+#chessboard {
+  width: 500pt;
+}

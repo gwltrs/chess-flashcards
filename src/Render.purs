@@ -12,11 +12,12 @@ import Data.Functor (map)
 import Types (Action(..), State, View(..), Alert(..))
   
 render :: forall m. State -> H.ComponentHTML Action () m
-render state = HH.div_ [contentDiv, alertDiv]
+render state = HH.div_ [menuDiv, chessboardDiv, alertDiv]
+
   where 
 
-    contentDiv :: H.ComponentHTML Action () m
-    contentDiv = 
+    menuDiv :: H.ComponentHTML Action () m
+    menuDiv = 
       case state.view of
         LoadingFile -> 
           HH.div_
@@ -41,6 +42,15 @@ render state = HH.div_ [contentDiv, alertDiv]
               menuButton "Back" BackToMain,
               menuButton "Save" SavePuzzle
             ]
+
+    chessboardDiv :: H.ComponentHTML Action () m
+    chessboardDiv = 
+      HH.div
+        [
+          HP.id_ "chessboard"
+        ]
+        [ 
+        ]
             
     alertDiv :: H.ComponentHTML Action () m
     alertDiv = 
@@ -69,7 +79,6 @@ render state = HH.div_ [contentDiv, alertDiv]
           ] 
       else 
         HH.div_ []
-
 
 menuButton :: forall w i. String -> w -> HC.HTML i w
 menuButton text action = 
