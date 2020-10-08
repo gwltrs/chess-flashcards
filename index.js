@@ -37,6 +37,7 @@ var PS = {};
 
         const board = ChessBoard('chessboard', {
           position: fen,
+          orientation: isWhiteTurn(fen) ? 'white' : 'black',
           draggable: true,
           onDragStart: (source, piece, position, orientation) => {
             if (hasMoved || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -45,7 +46,11 @@ var PS = {};
           },
           onDrop: (source, target) => {
             hasMoved = true;
+            console.log('boooom!');
             res('boooom!');
+
+
+
               // const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, derivedState.game);
               // const moveString = stringMoveFromObjectMove(moveObject);
               // const move = derivedState.game.move(moveObject);
@@ -137,6 +142,11 @@ var PS = {};
     } else {
       return fen.substring(0, result.index);
     }
+  }
+
+  const isWhiteTurn = (fen) => {
+    const regex = /^\S+ ([bw])/;
+    return fen.match(regex)[1] === 'w';
   }
 
   /*
@@ -6272,7 +6282,13 @@ var PS = {};
           });
       };
   };
+  var get = function (dictMonadState) {
+      return state(dictMonadState)(function (s) {
+          return new Data_Tuple.Tuple(s, s);
+      });
+  };
   exports["MonadState"] = MonadState;
+  exports["get"] = get;
   exports["modify_"] = modify_;
 })(PS);
 (function(exports) {
@@ -11779,13 +11795,21 @@ var PS = {};
   };
   var handleAction = function (dictMonadAff) {
       return function (action) {
+          var boardFEN = function (state) {
+              if (state.view instanceof Types.CreatingPuzzle) {
+                  return state.view.value1;
+              };
+              return "";
+          };
           if (action instanceof Types.CreatePuzzle) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (state) {
                   return Reducer.reducer(state)(action);
               }))(function () {
-                  return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -")))(function (move) {
-                      return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (state) {
-                          return Reducer.reducer(state)(Types.BackToMain.value);
+                  return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (state) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(state))))(function (move) {
+                          return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (state1) {
+                              return Reducer.reducer(state1)(Types.BackToMain.value);
+                          });
                       });
                   });
               });

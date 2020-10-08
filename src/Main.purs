@@ -33,11 +33,17 @@ component =
 initialState :: forall i. i -> State
 initialState _ = { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
 
+-- Implementing IO/async logic here but delegating pure logic to the reducer
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM State Action () o m Unit
 handleAction action = case action of
   CreatePuzzle -> do
     H.modify_ \state -> reducer state action
-    move <- H.liftAff (getMove "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -")
+    state <- H.get
+    move <- H.liftAff (getMove (boardFEN state))
     H.modify_ \state -> reducer state BackToMain
   _ ->
     H.modify_ \state -> reducer state action
+  where
+    boardFEN state = case state.view of
+      CreatingPuzzle _ fen _ -> fen
+      _ -> ""

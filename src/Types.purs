@@ -8,21 +8,21 @@ import Data.Semigroup ((<>))
 type State = 
   { 
     puzzles :: Array Puzzle, 
-    reviewStack :: Array PuzzleName, -- Names of the puzzles that are up for review
+    reviewStack :: Array Name, -- Names of the puzzles that are up for review
     view :: View,
     alert :: Maybe Alert
   }
 
 type Puzzle = 
   { 
-    name :: PuzzleName,
+    name :: Name,
     fen :: FEN,
     move :: Move,
     box :: Days,
     lastDrilledAt :: Seconds
   }
 
-type PuzzleName = String
+type Name = String
 
 type FEN = String
 
@@ -54,8 +54,8 @@ instance showUnderpromotion :: Show Underpromotion where
 
 data View = 
   LoadingFile | 
-  MainMenu PuzzleName FEN | 
-  CreatingPuzzle PuzzleName FEN (Maybe Move)
+  MainMenu Name FEN | 
+  CreatingPuzzle Name FEN (Maybe Move)
 
 derive instance eqView :: Eq View
 
@@ -85,7 +85,7 @@ data Action =
   LoadFile | 
   SaveFile | 
   Review | 
-  UpdatePuzzleName PuzzleName |
+  UpdatePuzzleName Name |
   UpdateFEN FEN |
   CreatePuzzle | 
   BackToMain |

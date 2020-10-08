@@ -34,6 +34,7 @@ exports.getMoveImpl = (fen) => {
 
       const board = ChessBoard('chessboard', {
         position: fen,
+        orientation: isWhiteTurn(fen) ? 'white' : 'black',
         draggable: true,
         onDragStart: (source, piece, position, orientation) => {
           if (hasMoved || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -42,7 +43,11 @@ exports.getMoveImpl = (fen) => {
         },
         onDrop: (source, target) => {
           hasMoved = true;
+          console.log('boooom!');
           res('boooom!');
+
+
+
             // const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, derivedState.game);
             // const moveString = stringMoveFromObjectMove(moveObject);
             // const move = derivedState.game.move(moveObject);
@@ -134,6 +139,11 @@ const removeMoveNumberFromFEN = (fen) => {
   } else {
     return fen.substring(0, result.index);
   }
+}
+
+const isWhiteTurn = (fen) => {
+  const regex = /^\S+ ([bw])/;
+  return fen.match(regex)[1] === 'w';
 }
 
 /*
