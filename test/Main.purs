@@ -10,7 +10,7 @@ import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types (Action(..), FEN, View(..), Alert(..), Puzzle, Underpromotion(..))
+import Types (Action(..), FEN, View(..), Alert(..), Puzzle)
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -255,11 +255,7 @@ endgamePuzzle1 =
   { 
     name: "endgame 1",
     fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
-    move: {
-      from: "d7",
-      to: "d8",
-      underpromotion: Just Knight
-    },
+    move: "d7d8k",
     box: 2,
     lastDrilledAt: 1601324525
   }
@@ -269,11 +265,7 @@ endgamePuzzle2 =
   { 
     name: "endgame 2",
     fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
-    move: {
-      from: "g6",
-      to: "g7",
-      underpromotion: Nothing
-    },
+    move: "g6g7",
     box: 4,
     lastDrilledAt: 1601324534
   }

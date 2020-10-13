@@ -40,16 +40,16 @@ exports.getMoveImpl = (fen) => {
               }
             },
             onDrop: (source, target) => {
-              hasMoved = true;
               const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, game);
               const moveString = moveObject.from + moveObject.to + (moveObject.promotion === 'q' ? '' : moveObject.promotion);
               const move = game.move(moveObject);
               if (move === null) {
                 return 'snapback';
               } else {
+                hasMoved = true;
                 delay(5, () => {
-                  board.position(game.fen());
                   res(moveString);
+                  board.position(game.fen());
                   if (expectedMove.length === 0) {
                     graySquare(moveObject.from);
                     graySquare(moveObject.to);
@@ -175,15 +175,18 @@ const getPromotionLetter = () => {
   }
 }
 
-document.addEventListener("keydown", e => {
-  if (e.keyCode === 82) {
-      lastUnderPromotionHotKey = { letter: "r", seconds: epochSeconds() };
-  } else if (e.keyCode === 78) {
-      lastUnderPromotionHotKey = { letter: "n", seconds: epochSeconds() };
-  } else if (e.keyCode === 66) {
-      lastUnderPromotionHotKey = { letter: "b", seconds: epochSeconds() };
-  }
-});
+try {
+  document.addEventListener("keydown", e => {
+    if (e.keyCode === 82) {
+        lastUnderPromotionHotKey = { letter: "r", seconds: epochSeconds() };
+    } else if (e.keyCode === 78) {
+        lastUnderPromotionHotKey = { letter: "n", seconds: epochSeconds() };
+    } else if (e.keyCode === 66) {
+        lastUnderPromotionHotKey = { letter: "b", seconds: epochSeconds() };
+    }
+  });
+} catch (err) {
+}
 
 const delay = (milliseconds, f) => {
   setTimeout(f, milliseconds);

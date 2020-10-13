@@ -26,31 +26,13 @@ type Name = String
 
 type FEN = String
 
-type Move = 
-  { 
-    from :: Space,
-    to :: Space,
-    underpromotion :: Maybe Underpromotion
-  }
+-- In the format: fromSpace <> toSpace <> underpromotionFirstLetter
+-- Examples: 'c4d5', 'c7c8r', 'h2h1b', 'f7f8k'
+type Move = String 
 
 type Days = Int
 
 type Seconds = Int
-
-type Space = String -- In the format of 'a8', 'h4', 'f3', etc.
-
-data Underpromotion = 
-  Bishop | 
-  Knight | 
-  Rook
-
-derive instance eqUnderpromotion :: Eq Underpromotion
-
-instance showUnderpromotion :: Show Underpromotion where
-  show up = case up of
-    Bishop -> "Bishop"
-    Knight -> "Knight"
-    Rook -> "Rook"
 
 data View = 
   LoadingFile | 

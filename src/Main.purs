@@ -4,7 +4,6 @@ import Prelude (Unit, bind, unit, discard)
 
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
---import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Aff as HA
