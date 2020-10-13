@@ -22,70 +22,59 @@ exports.sanitizeFEN = (fen) => {
 };
 
 exports.getMoveImpl = (fen) => {
+  return function (expectedMove) {
+    return function() {
+      return new Promise((res, rej) => {
+        try {
 
-  console.log('got fen', fen);
+          let hasMoved = false;
+          const game = new Chess(toChessJSFEN(fen));
 
-  return function() {
-    console.log('inner called');
-    return new Promise((res, rej) => {
-
-      let hasMoved = false;
-      const game = new Chess(toChessJSFEN(fen));
-
-      const board = ChessBoard('chessboard', {
-        position: fen,
-        orientation: isWhiteTurn(fen) ? 'white' : 'black',
-        draggable: true,
-        onDragStart: (source, piece, position, orientation) => {
-          if (hasMoved || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-              return false;
-          }
-        },
-        onDrop: (source, target) => {
-          hasMoved = true;
-          console.log('boooom!');
-          res('boooom!');
-
-
-
-            // const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, derivedState.game);
-            // const moveString = stringMoveFromObjectMove(moveObject);
-            // const move = derivedState.game.move(moveObject);
-            // if (move === null) {
-            //     return 'snapback';
-            // } else {
-            //     delay(5, () => { 
-            //         derivedState.board.position(derivedState.game.fen());
-            //         state.moveStringJustMade = moveString;
-            //         if (state.drillTitle === null) {
-            //             graySquare(moveObject.from);
-            //             graySquare(moveObject.to);
-            //         } else {
-            //             const drillMove = state.data.find(p => p.title === state.drillTitle).move;
-            //             if (moveString === drillMove) {
-            //                 greenSquare(moveObject.to);
-            //                 if (state.isFirstTry) {
-            //                     updateStateForDrillSuccess();
-            //                     state.isFirstTry = false;
-            //                 }
-            //             } else {
-            //                 redSquare(moveObject.to);
-            //                 if (state.isFirstTry) {
-            //                     updateStateForDrillFailure();
-            //                     state.isFirstTry = false;
-            //                 }
-            //             }
-            //         }
-            //     });
-            // }
-            
+          const board = ChessBoard('chessboard', {
+            position: fen,
+            orientation: isWhiteMove(fen) ? 'white' : 'black',
+            draggable: true,
+            onDragStart: (source, piece, position, orientation) => {
+              if (hasMoved || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+                  return false;
+              }
+            },
+            onDrop: (source, target) => {
+              hasMoved = true;
+              const moveObject = removeUnnecessaryUnderpromotion({ from: source, to: target, promotion: getPromotionLetter() }, game);
+              const moveString = moveObject.from + moveObject.to + (moveObject.promotion === 'q' ? '' : moveObject.promotion);
+              const move = game.move(moveObject);
+              if (move === null) {
+                return 'snapback';
+              } else {
+                delay(5, () => {
+                  board.position(game.fen());
+                  res(moveString);
+                  if (expectedMove.length === 0) {
+                    graySquare(moveObject.from);
+                    graySquare(moveObject.to);
+                  } else {
+                    if (moveString === expectedMove) {
+                      greenSquare(moveObject.to);
+                    } else {
+                      redSquare(moveObject.to);
+                    }
+                  }
+                });
+              }
+            }
+          });
+        } catch (err) {
         }
       });
-    });
-
-  };
-  
+    };
+  }
 };
+
+const WHITE_SQUARE_GRAY = '#A9A9A9';
+const BLACK_SQUARE_GRAY = '#696969';
+const SQUARE_GREEN = '#ACCE59';
+const SQUARE_RED = '#F42A32';
 
 const numberOfSpaces = (str) => {
   var string = str,
@@ -141,9 +130,84 @@ const removeMoveNumberFromFEN = (fen) => {
   }
 }
 
-const isWhiteTurn = (fen) => {
+const isWhiteMove = (fen) => {
   const regex = /^\S+ ([bw])/;
   return fen.match(regex)[1] === 'w';
+}
+
+const removeUnnecessaryUnderpromotion = (moveObject, game) => {
+
+  let underpromotionIsValid = false;
+
+  const fromPiece = game.get(moveObject.from);
+  const fromPieceIsPawn = fromPiece.type === 'p';
+  const isWhiteTurn = game.turn() === 'w';
+  const toLastRank = moveObject.to.charAt(1) === '8';
+  const toFirstRank = moveObject.to.charAt(1) === '1';
+
+  if (fromPieceIsPawn && ((isWhiteTurn && toLastRank) || (!isWhiteTurn && toFirstRank))) {
+      underpromotionIsValid = true;
+  }
+
+  return {
+      from: moveObject.from,
+      to: moveObject.to,
+      promotion: underpromotionIsValid ? moveObject.promotion : 'q'
+  }
+}
+
+const epochSeconds = () => {
+  return (new Date).getTime() / 1000;
+}
+
+let lastUnderPromotionHotKey = null;
+const getPromotionLetter = () => {
+  if (lastUnderPromotionHotKey === null) {
+      return "q";
+  } else {
+      let nowSeconds = epochSeconds();
+      if ((nowSeconds - lastUnderPromotionHotKey.seconds) <= 3) {
+          lastUnderPromotionHotKey.seconds = 0;
+          return lastUnderPromotionHotKey.letter;
+      } else {
+          return "q";
+      }
+  }
+}
+
+document.addEventListener("keydown", e => {
+  if (e.keyCode === 82) {
+      lastUnderPromotionHotKey = { letter: "r", seconds: epochSeconds() };
+  } else if (e.keyCode === 78) {
+      lastUnderPromotionHotKey = { letter: "n", seconds: epochSeconds() };
+  } else if (e.keyCode === 66) {
+      lastUnderPromotionHotKey = { letter: "b", seconds: epochSeconds() };
+  }
+});
+
+const delay = (milliseconds, f) => {
+  setTimeout(f, milliseconds);
+}
+
+const graySquare = (square) => {
+  let $square = $('#chessboard .square-' + square);
+  let background = WHITE_SQUARE_GRAY;
+  if ($square.hasClass('black-3c85d')) {
+    background = BLACK_SQUARE_GRAY;
+  }
+  $square.css('background', background);
+}
+
+const greenSquare = (square) => {
+  let $square = $('#chessboard .square-' + square);
+  const background = SQUARE_GREEN;
+  $square.css('background', background);
+}
+
+const redSquare = (square) => {
+  let $square = $('#chessboard .square-' + square);
+  const background = SQUARE_RED;
+  $square.css('background', background);
 }
 
 /*

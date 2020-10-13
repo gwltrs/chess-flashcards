@@ -4,7 +4,7 @@ import Prelude (Unit, bind, unit, discard)
 
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Aff (Aff)
+--import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.Aff as HA
@@ -39,8 +39,8 @@ handleAction action = case action of
   CreatePuzzle -> do
     H.modify_ \state -> reducer state action
     state <- H.get
-    move <- H.liftAff (getMove (boardFEN state))
-    H.modify_ \state -> reducer state BackToMain
+    move <- H.liftAff (getMove (boardFEN state) "c4d5")
+    H.modify_ \state2 -> reducer state2 BackToMain
   _ ->
     H.modify_ \state -> reducer state action
   where
