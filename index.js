@@ -28,7 +28,7 @@ var PS = {};
     return function (expectedMove) {
       return function() {
         return new Promise((res, rej) => {
-          try {
+          //try {
 
             let hasMoved = false;
             const game = new Chess(toChessJSFEN(fen));
@@ -53,6 +53,7 @@ var PS = {};
                   delay(5, () => {
                     res(moveString);
                     board.position(game.fen());
+                    clearSquareBackgrounds();
                     if (expectedMove.length === 0) {
                       graySquare(moveObject.from);
                       graySquare(moveObject.to);
@@ -67,9 +68,16 @@ var PS = {};
                 }
               }
             });
-          } catch (err) {
-          }
+            //delay(5, () => {
+            highlightEnPassantAndCastling('chessboard', fen);
+              //highlightSquare('chessboard', 'a1', 'red');
+            console.log('highlights');
+            //});
+
+          //} catch (err) {
+          //}
         });
+      
       };
     }
   };
@@ -78,6 +86,10 @@ var PS = {};
   const BLACK_SQUARE_GRAY = '#696969';
   const SQUARE_GREEN = '#ACCE59';
   const SQUARE_RED = '#F42A32';
+  const SQUARE_BLUE = '#63B0D6';
+  const SQUARE_ORANGE = '#E6912C';
+  const SQUARE_WHITE = '#F0D9B5';
+  const SQUARE_BLACK = '#B58863';
 
   const numberOfSpaces = (str) => {
     var string = str,
@@ -206,14 +218,91 @@ var PS = {};
 
   const greenSquare = (square) => {
     let $square = $('#chessboard .square-' + square);
-    const background = SQUARE_GREEN;
-    $square.css('background', background);
+    $square.css('background', SQUARE_GREEN);
   }
 
   const redSquare = (square) => {
     let $square = $('#chessboard .square-' + square);
-    const background = SQUARE_RED;
-    $square.css('background', background);
+    $square.css('background', SQUARE_RED);
+  }
+
+  const blueSquare = (square) => {
+    let $square = $('#chessboard .square-' + square);
+    $square.css('background', SQUARE_BLUE);
+  }
+
+  const orangeSquare = (square) => {
+    let $square = $('#chessboard .square-' + square);
+    $square.css('background', SQUARE_ORANGE);
+  }
+
+  const clearSquareBackgrounds = () => {
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    for (let f = 0; f < 8; f++) {
+      for (let r = 0; r < 8; r++) {
+        let $square = $('#chessboard .square-' + files[f] + ranks[r]);
+        $square.css('background', ((f + r) % 2 === 0) ? SQUARE_BLACK : SQUARE_WHITE);
+      }
+    }
+  };
+
+  const highlightEnPassantAndCastling = (boardID, fen) => {
+    $("#" + boardID + " .square-55d63").removeClass("highlight-red");
+    $("#" + boardID + " .square-55d63").removeClass("highlight-blue");
+    let enPassant = extractEnPassantFromFEN(fen);console.log(enPassant);
+    if (enPassant !== "-") {
+      blueSquare(enPassant.replace("6", "5").replace("3", "4"));
+    }
+    let castlingState = getCastlingState(fen);console.log(castlingState);
+    if (castlingState["O-O"] === false) {
+      orangeSquare("h1");
+    }
+    if (castlingState["O-O-O"] === false) {
+      orangeSquare("a1");
+    }
+    if (castlingState["o-o"] === false) {
+      orangeSquare("h8");
+    }
+    if (castlingState["o-o-o"] === false) {
+      orangeSquare("a8");
+    }
+  }
+
+  /**
+ * @param rawFEN: FEN with moves suffix
+ * @returns
+ * { "O-O": Bool?, "O-O-O": Bool?, "o-o": Bool?, "o-o-o": Bool? }
+ * If castling rights are intact: true
+ * If castling rights are lost, but King and Rook are on initial squares: false
+ * If King and/or Rook aren't on their initial squares: null
+ */  
+  const getCastlingState = (rawFEN) => {
+    let chess = Chess(toChessJSFEN(rawFEN))
+    let castling = extractCastlingFromFEN(rawFEN)
+    let piecesAt = {};
+    ["a", "e", "h"].forEach(file => {
+        ["1", "8"].forEach(rank => {
+            let piece = chess.get(file + rank)
+            piecesAt[file + rank] = piece ? (piece.color + piece.type) : ""
+        })
+    })
+    return {
+        "O-O": (piecesAt["h1"] === "wr" && piecesAt["e1"] === "wk") ? castling.includes("K") : null,
+        "O-O-O": (piecesAt["a1"] === "wr" && piecesAt["e1"] === "wk") ? castling.includes("Q") : null,
+        "o-o": (piecesAt["h8"] === "br" && piecesAt["e8"] === "bk") ? castling.includes("k") : null,
+        "o-o-o": (piecesAt["a8"] === "br" && piecesAt["e8"] === "bk") ? castling.includes("q") : null
+    }
+  }
+
+  const extractCastlingFromFEN = (fen) => {
+    let regex = /^\S+ \S+ (\S+) \S+/;
+    return fen.match(regex)[1];
+  }
+
+  const extractEnPassantFromFEN = (fen) => {
+    let regex = /^\S+ \S+ \S+ (\S+)/;
+    return fen.match(regex)[1];
   }
 
   /*
