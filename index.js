@@ -28,7 +28,7 @@ var PS = {};
     return function (expectedMove) {
       return function() {
         return new Promise((res, rej) => {
-          //try {
+          try {
 
             let hasMoved = false;
             const game = new Chess(toChessJSFEN(fen));
@@ -68,14 +68,9 @@ var PS = {};
                 }
               }
             });
-            //delay(5, () => {
             highlightEnPassantAndCastling('chessboard', fen);
-              //highlightSquare('chessboard', 'a1', 'red');
-            console.log('highlights');
-            //});
-
-          //} catch (err) {
-          //}
+          } catch (err) {
+          }
         });
       
       };
@@ -250,11 +245,11 @@ var PS = {};
   const highlightEnPassantAndCastling = (boardID, fen) => {
     $("#" + boardID + " .square-55d63").removeClass("highlight-red");
     $("#" + boardID + " .square-55d63").removeClass("highlight-blue");
-    let enPassant = extractEnPassantFromFEN(fen);console.log(enPassant);
+    let enPassant = extractEnPassantFromFEN(fen);
     if (enPassant !== "-") {
       blueSquare(enPassant.replace("6", "5").replace("3", "4"));
     }
-    let castlingState = getCastlingState(fen);console.log(castlingState);
+    let castlingState = getCastlingState(fen);
     if (castlingState["O-O"] === false) {
       orangeSquare("h1");
     }
