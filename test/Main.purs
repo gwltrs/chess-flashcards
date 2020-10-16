@@ -220,15 +220,6 @@ main = runTest do
           CreatePuzzle
         ) 
 
-    test "User closes alert box" do
-
-      Assert.equal 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Nothing }
-        (reducer 
-          { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 1 " openGameFEN, alert: Just DuplicateName }
-          CloseAlert
-        ) 
-
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
 

@@ -12,7 +12,7 @@ import Data.Functor (map)
 import Types (Action(..), State, View(..), Alert(..))
   
 render :: forall m. State -> H.ComponentHTML Action () m
-render state = HH.div_ [menuDiv, chessboardDiv, alertDiv]
+render state = HH.div_ [menuDiv, chessboardDiv]
 
   where 
 
@@ -51,34 +51,6 @@ render state = HH.div_ [menuDiv, chessboardDiv, alertDiv]
         ]
         [ 
         ]
-            
-    alertDiv :: H.ComponentHTML Action () m
-    alertDiv = 
-      if isJust state.alert
-      then 
-        HH.div
-          [
-            HP.class_ (HC.ClassName "modalBackground")
-          ]
-          [ 
-            HH.div
-              [
-                HP.class_ (HC.ClassName "modalContent")
-              ]
-              [ 
-                HH.button 
-                  [ 
-                    HE.onClick \_ -> Just CloseAlert,
-                    HP.class_ (HC.ClassName "closeButton")
-                  ]
-                  [ HH.text "Close" ],
-                HH.span
-                  [ HP.class_ (HC.ClassName "alertText") ]
-                  [ state.alert # map alertText # fromMaybe "" # HH.text ]
-              ] 
-          ] 
-      else 
-        HH.div_ []
 
 menuButton :: forall w i. String -> w -> HC.HTML i w
 menuButton text action = 

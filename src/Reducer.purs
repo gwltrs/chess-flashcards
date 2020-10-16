@@ -50,8 +50,6 @@ reducer state action =
           state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) (sanitizeFEN trimmedFEN) Nothing }
     { act: BackToMain, vw: _ } ->
       state { view = MainMenu "" "" }
-    { act: CloseAlert, vw: _ } -> 
-      state { alert = Nothing }
     { act: _, vw: _ } ->
       state
 

@@ -9,10 +9,13 @@ import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.VDom.Driver (runUI)
+import Web.HTML (window)
+import Web.HTML.Window (alert)
+import Control.Applicative (pure)
 
 import Types
 import Reducer (reducer)
-import Render (render)
+import Render (render, alertText)
 import Chess (getMove)
 
 main :: Effect Unit
@@ -34,15 +37,31 @@ initialState _ = { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothi
 
 -- Implementing IO/async logic here but delegating pure logic to the reducer
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM State Action () o m Unit
-handleAction action = case action of
-  CreatePuzzle -> do
-    H.modify_ \state -> reducer state action
-    state <- H.get
-    move <- H.liftAff (getMove (boardFEN state) "c4d5")
-    H.modify_ \state2 -> reducer state2 BackToMain
-  _ ->
-    H.modify_ \state -> reducer state action
-  where
-    boardFEN state = case state.view of
-      CreatingPuzzle _ fen _ -> fen
-      _ -> ""
+handleAction action = do
+
+  -- First we apply the action and get the new state
+  H.modify_ \state -> reducer state action
+  stateAfterAction <- H.get
+
+  -- For testability reasons we want the alert to be represented in the state
+  -- If a "Just alert" is found, the alert is removed from the state and rendered
+  case stateAfterAction.alert of
+    Just alertInState -> do
+      w <- H.liftEffect window
+      H.liftEffect (alert (alertText alertInState) w)
+      H.modify_ \stateWithAlert -> stateWithAlert { alert = Nothing }
+    Nothing ->
+      pure unit
+
+  -- Firing off the rest of the Effects and Affs
+  case action of
+    CreatePuzzle -> do
+      move <- H.liftAff (getMove (boardFEN stateAfterAction) "c4d5")
+      H.modify_ \state2 -> reducer state2 BackToMain
+    _ ->
+      pure unit
+
+boardFEN :: State -> FEN
+boardFEN state = case state.view of
+  CreatingPuzzle _ fen _ -> fen
+  _ -> ""

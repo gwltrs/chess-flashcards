@@ -71,5 +71,4 @@ data Action =
   UpdateFEN FEN |
   CreatePuzzle | 
   BackToMain |
-  SavePuzzle |
-  CloseAlert
+  SavePuzzle
