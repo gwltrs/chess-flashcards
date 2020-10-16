@@ -65,7 +65,7 @@ menuButton text action =
 
 alertText :: Alert -> String
 alertText = case _ of
-  MissingNameOrFEN -> "Missing name or FEN"
+  MissingNameOrFEN -> "Missing name and/or FEN"
   InvalidFEN -> "Invalid FEN"
   DuplicateName -> "Duplicate name"
   DuplicateFEN -> "Duplicate FEN"
