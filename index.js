@@ -11656,6 +11656,15 @@ var PS = {};
       CreatePuzzle.value = new CreatePuzzle();
       return CreatePuzzle;
   })();
+  var AddMoveToNewPuzzle = (function () {
+      function AddMoveToNewPuzzle(value0) {
+          this.value0 = value0;
+      };
+      AddMoveToNewPuzzle.create = function (value0) {
+          return new AddMoveToNewPuzzle(value0);
+      };
+      return AddMoveToNewPuzzle;
+  })();
   var BackToMain = (function () {
       function BackToMain() {
 
@@ -11684,6 +11693,7 @@ var PS = {};
   exports["UpdatePuzzleName"] = UpdatePuzzleName;
   exports["UpdateFEN"] = UpdateFEN;
   exports["CreatePuzzle"] = CreatePuzzle;
+  exports["AddMoveToNewPuzzle"] = AddMoveToNewPuzzle;
   exports["BackToMain"] = BackToMain;
   exports["SavePuzzle"] = SavePuzzle;
 })(PS);
@@ -11748,11 +11758,11 @@ var PS = {};
   };
   var reducer = function (state) {
       return function (action) {
-          var $27 = {
+          var $28 = {
               act: action,
               vw: state.view
           };
-          if ($27.act instanceof Types.NewFile) {
+          if ($28.act instanceof Types.NewFile) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
@@ -11760,7 +11770,7 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($27.act instanceof Types.LoadFile) {
+          if ($28.act instanceof Types.LoadFile) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
@@ -11768,27 +11778,27 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($27.act instanceof Types.UpdatePuzzleName && $27.vw instanceof Types.MainMenu) {
+          if ($28.act instanceof Types.UpdatePuzzleName && $28.vw instanceof Types.MainMenu) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
-                  view: new Types.MainMenu($27.act.value0, $27.vw.value1),
+                  view: new Types.MainMenu($28.act.value0, $28.vw.value1),
                   alert: state.alert
               };
           };
-          if ($27.act instanceof Types.UpdateFEN && $27.vw instanceof Types.MainMenu) {
+          if ($28.act instanceof Types.UpdateFEN && $28.vw instanceof Types.MainMenu) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
-                  view: new Types.MainMenu($27.vw.value0, $27.act.value0),
+                  view: new Types.MainMenu($28.vw.value0, $28.act.value0),
                   alert: state.alert
               };
           };
-          if ($27.act instanceof Types.CreatePuzzle && $27.vw instanceof Types.MainMenu) {
-              var trimmedName = Data_String_Common.trim($27.vw.value0);
-              var trimmedFEN = Data_String_Common.trim($27.vw.value1);
-              var $42 = Data_String_CodePoints.length(trimmedName) === 0 || Data_String_CodePoints.length(trimmedFEN) === 0;
-              if ($42) {
+          if ($28.act instanceof Types.CreatePuzzle && $28.vw instanceof Types.MainMenu) {
+              var trimmedName = Data_String_Common.trim($28.vw.value0);
+              var trimmedFEN = Data_String_Common.trim($28.vw.value1);
+              var $43 = Data_String_CodePoints.length(trimmedName) === 0 || Data_String_CodePoints.length(trimmedFEN) === 0;
+              if ($43) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -11796,8 +11806,8 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.MissingNameOrFEN.value)
                   };
               };
-              var $43 = !Chess.fenIsValid($27.vw.value1);
-              if ($43) {
+              var $44 = !Chess.fenIsValid($28.vw.value1);
+              if ($44) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -11805,10 +11815,10 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.InvalidFEN.value)
                   };
               };
-              var $44 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(trimmedName)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
+              var $45 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(trimmedName)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
                   return p.name;
               })(state.puzzles)));
-              if ($44) {
+              if ($45) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -11816,10 +11826,10 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.DuplicateName.value)
                   };
               };
-              var $45 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(trimmedFEN)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
+              var $46 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(trimmedFEN)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
                   return p.fen;
               })(state.puzzles)));
-              if ($45) {
+              if ($46) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -11834,11 +11844,19 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($27.act instanceof Types.BackToMain) {
+          if ($28.act instanceof Types.BackToMain) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
                   view: new Types.MainMenu("", ""),
+                  alert: state.alert
+              };
+          };
+          if ($28.act instanceof Types.AddMoveToNewPuzzle && $28.vw instanceof Types.CreatingPuzzle) {
+              return {
+                  puzzles: state.puzzles,
+                  reviewStack: state.reviewStack,
+                  view: new Types.CreatingPuzzle($28.vw.value0, $28.vw.value1, new Data_Maybe.Just($28.act.value0)),
                   alert: state.alert
               };
           };
@@ -11880,14 +11898,14 @@ var PS = {};
           if (state.view instanceof Types.CreatingPuzzle) {
               return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value), menuButton("Save")(Types.SavePuzzle.value) ]);
           };
-          throw new Error("Failed pattern match at Render (line 21, column 7 - line 44, column 14): " + [ state.view.constructor.name ]);
+          throw new Error("Failed pattern match at Render (line 19, column 7 - line 42, column 14): " + [ state.view.constructor.name ]);
       })();
       var chessboardDiv = Halogen_HTML_Elements.div([ Halogen_HTML_Properties.id_("chessboard") ])([  ]);
       return Halogen_HTML_Elements.div_([ menuDiv, chessboardDiv ]);
   };
   var alertText = function (v) {
       if (v instanceof Types.MissingNameOrFEN) {
-          return "Missing name or FEN";
+          return "Missing name and/or FEN";
       };
       if (v instanceof Types.InvalidFEN) {
           return "Invalid FEN";
@@ -11898,7 +11916,7 @@ var PS = {};
       if (v instanceof Types.DuplicateFEN) {
           return "Duplicate FEN";
       };
-      throw new Error("Failed pattern match at Render (line 67, column 13 - line 71, column 34): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Render (line 65, column 13 - line 69, column 34): " + [ v.constructor.name ]);
   };
   exports["render"] = render;
   exports["alertText"] = alertText;
@@ -11970,8 +11988,8 @@ var PS = {};
                   })())(function () {
                       if (action instanceof Types.CreatePuzzle) {
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(stateAfterAction))("c4d5")))(function (move) {
-                              return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (state2) {
-                                  return Reducer.reducer(state2)(Types.BackToMain.value);
+                              return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (newPuzzleState) {
+                                  return Reducer.reducer(newPuzzleState)(new Types.AddMoveToNewPuzzle(move));
                               });
                           });
                       };
