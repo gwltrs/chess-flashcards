@@ -56,7 +56,7 @@ handleAction action = do
   -- Firing off the rest of the Effects and Affs
   case action of
     CreatePuzzle -> do
-      move <- H.liftAff (getMove (boardFEN stateAfterAction) "c4d5")
+      move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
       H.modify_ \newPuzzleState -> reducer newPuzzleState (AddMoveToNewPuzzle move)
     _ ->
       pure unit
