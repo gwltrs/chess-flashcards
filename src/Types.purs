@@ -69,6 +69,7 @@ data Action =
   Review | 
   UpdatePuzzleName Name |
   UpdateFEN FEN |
-  CreatePuzzle | 
+  CreatePuzzle |
+  AddMoveToNewPuzzle Move |
   BackToMain |
   SavePuzzle

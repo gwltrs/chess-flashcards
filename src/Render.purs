@@ -5,9 +5,7 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Core as HC
-import Data.Maybe (Maybe(..), isJust, fromMaybe)
-import Data.Function ((#))
-import Data.Functor (map)
+import Data.Maybe (Maybe(..))
 
 import Types (Action(..), State, View(..), Alert(..))
   

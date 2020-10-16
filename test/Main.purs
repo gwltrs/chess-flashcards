@@ -220,6 +220,15 @@ main = runTest do
           CreatePuzzle
         ) 
 
+    test "User adds move to new puzzle" do
+
+      Assert.equal 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Opera House Checkmate" ohcFEN (Just "a1h8"), alert: Nothing }
+        (reducer 
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Opera House Checkmate" ohcFEN Nothing, alert: Nothing }
+          (AddMoveToNewPuzzle "a1h8")
+        ) 
+
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
 
