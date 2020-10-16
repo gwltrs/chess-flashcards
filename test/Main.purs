@@ -10,7 +10,7 @@ import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
-import Types (Action(..), FEN, View(..), Alert(..), Puzzle)
+import Types (Action(..), Name, FEN, Move, View(..), Alert(..), Puzzle)
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -223,14 +223,48 @@ main = runTest do
     test "User adds move to new puzzle" do
 
       Assert.equal 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Opera House Checkmate" ohcFEN (Just "a1h8"), alert: Nothing }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle ohcName ohcFEN (Just ohcMove), alert: Nothing }
         (reducer 
-          { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "Opera House Checkmate" ohcFEN Nothing, alert: Nothing }
-          (AddMoveToNewPuzzle "a1h8")
-        ) 
+          { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle ohcName ohcFEN Nothing, alert: Nothing }
+          (AddMoveToNewPuzzle ohcMove)
+        )
+
+    test "User saves puzzle after adding a move" do
+
+      -- Puzzles should be sorted by name ascending.
+      -- Not testing use case where the move hasn't been made since the 
+      -- save button is disabled when the move hasn't been made yet.
+      -- Should return user to main menu after saving puzzle.
+
+      Assert.equal 
+        { puzzles: [ohcPuzzle], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+        (reducer 
+          { puzzles: [], reviewStack: [], view: CreatingPuzzle ohcName ohcFEN (Just ohcMove), alert: Nothing }
+          SavePuzzle
+        )
+
+      Assert.equal 
+        { puzzles: [ohcPuzzle { name = "a" }, endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+        (reducer 
+          { puzzles: [endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: CreatingPuzzle "a" ohcFEN (Just ohcMove), alert: Nothing }
+          SavePuzzle
+        )
+
+      Assert.equal 
+        { puzzles: [endgamePuzzle1, endgamePuzzle2, ohcPuzzle { name = "z" }], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+        (reducer 
+          { puzzles: [endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: CreatingPuzzle "z" ohcFEN (Just ohcMove), alert: Nothing }
+          SavePuzzle
+        )
 
 ohcFEN :: FEN
 ohcFEN = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k -"
+
+ohcName :: Name
+ohcName = "Opera House Checkmate"
+
+ohcMove :: Move
+ohcMove = "b3b8"
 
 ohcFENWithMoveNumbers :: FEN
 ohcFENWithMoveNumbers = "4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 16"
@@ -268,6 +302,16 @@ endgamePuzzle2 =
     move: "g6g7",
     box: 4,
     lastDrilledAt: 1601324534
+  }
+
+ohcPuzzle :: Puzzle
+ohcPuzzle = 
+  {
+    name: ohcName,
+    fen: ohcFEN,
+    move: ohcMove,
+    box: 8,
+    lastDrilledAt: 1601324999
   }
 
 twoEndgamePuzzles :: Array Puzzle

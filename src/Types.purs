@@ -71,5 +71,5 @@ data Action =
   UpdateFEN FEN |
   CreatePuzzle |
   AddMoveToNewPuzzle Move |
-  BackToMain |
-  SavePuzzle
+  SavePuzzle |
+  BackToMain
