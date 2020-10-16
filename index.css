@@ -65,3 +65,13 @@ body {
 #chessboard {
   width: 500pt;
 }
+
+.label {
+  width: 150pt;
+  height: 19pt;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 11pt;
+  background-color: transparent;
+  border: transparent;
+  text-align: center;
+}

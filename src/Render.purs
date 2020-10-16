@@ -34,10 +34,15 @@ render state = HH.div_ [menuDiv, chessboardDiv]
               HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdateFEN val) ],
               menuButton "Create" CreatePuzzle
             ]
-        CreatingPuzzle _ _ _ ->
+        CreatingPuzzle puzzleName _ _ ->
           HH.div_
             [ 
               menuButton "Back" BackToMain,
+              HH.input [
+                HP.class_ (HC.ClassName "label"),
+                HP.value puzzleName,
+                HP.readOnly true
+              ],
               menuButton "Save" SavePuzzle
             ]
 
