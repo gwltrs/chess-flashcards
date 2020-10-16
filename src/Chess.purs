@@ -13,7 +13,7 @@ foreign import sanitizeFEN :: String -> String
 
 foreign import getMoveImpl :: String -> String -> Effect (Promise String)
 
--- Since the app only gets one move from the user after setting up the board each time
+-- Since the app only gets one move from the user after setting up the board each time,
 -- the set-up-board and return-move-string logic can be implemented together as an Aff.
 -- The second parameter, the expected move, is only for board cosmetics. In quiz mode,
 -- the board will flash green/red depending if the user move matches the expected move.
