@@ -144,6 +144,8 @@ main = runTest do
 
     test "User tries to create puzzle with duplicate fen" do
 
+      -- Check should happen after FEN is trimmed and sanitized (move numbers and unnecessary en passant removed)
+
       Assert.equal 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" endgamePuzzle1.fen, alert: Just DuplicateFEN }
         (reducer 
@@ -152,11 +154,18 @@ main = runTest do
         ) 
 
       Assert.equal 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN } -- Making sure the check happens after the FEN is trimmed
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Just DuplicateFEN }
         (reducer 
           { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "new endgame" (" " <> endgamePuzzle2.fen <> " "), alert: Nothing }
           CreatePuzzle
-        ) 
+        )
+
+      Assert.equal 
+        { puzzles: [openGamePuzzle], reviewStack: [], view: MainMenu "develop" (" " <> openGameFENWithEnPassantAndMoveNumbers), alert: Just DuplicateFEN }
+        (reducer 
+          { puzzles: [openGamePuzzle], reviewStack: [], view: MainMenu "develop" (" " <> openGameFENWithEnPassantAndMoveNumbers), alert: Nothing }
+          CreatePuzzle
+        )
 
     test "User tries to create puzzle with duplicate name and FEN" do
 
@@ -311,6 +320,16 @@ ohcPuzzle =
     name: ohcName,
     fen: ohcFEN,
     move: ohcMove,
+    box: firstBox,
+    lastDrilledAt: 0
+  }
+
+openGamePuzzle :: Puzzle
+openGamePuzzle = 
+  {
+    name: "Open Game",
+    fen: openGameFEN,
+    move: "g1f3",
     box: firstBox,
     lastDrilledAt: 0
   }
