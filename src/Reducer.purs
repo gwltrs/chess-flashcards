@@ -66,7 +66,6 @@ reducer state action =
         }
         comparePuzzles l r =
           localeCompare l.name r.name
-          
       in
         state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
     { act: _, vw: _ } ->
