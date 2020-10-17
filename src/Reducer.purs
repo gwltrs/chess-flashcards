@@ -40,6 +40,7 @@ reducer state action =
       let
         trimmedName = trim name
         trimmedFEN = trim fen
+        sanitizedFEN = sanitizeFEN trimmedFEN
       in
         if (length trimmedName) == 0 || (length trimmedFEN) == 0 then
           state { alert = Just MissingNameOrFEN }
@@ -47,10 +48,10 @@ reducer state action =
           state { alert = Just InvalidFEN }
         else if state.puzzles # (map \p -> p.name) # elemIndex trimmedName # isJust then
           state { alert = Just DuplicateName }
-        else if state.puzzles # (map \p -> p.fen) # elemIndex trimmedFEN # isJust then
+        else if state.puzzles # (map \p -> p.fen) # elemIndex sanitizedFEN # isJust then
           state { alert = Just DuplicateFEN }
         else
-          state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) (sanitizeFEN trimmedFEN) Nothing }
+          state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) sanitizedFEN Nothing }
     { act: BackToMain, vw: _ } ->
       state { view = MainMenu "" "" }
     { act: AddMoveToNewPuzzle move, vw: CreatingPuzzle name fen _ } ->
