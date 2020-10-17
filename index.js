@@ -12023,18 +12023,18 @@ var PS = {};
   };
   var alertText = function (v) {
       if (v instanceof Types.MissingNameOrFEN) {
-          return "Missing name and/or FEN";
+          return "Empty field(s): provide a name and FEN for the new puzzle";
       };
       if (v instanceof Types.InvalidFEN) {
           return "Invalid FEN";
       };
       if (v instanceof Types.DuplicateName) {
-          return "Duplicate name";
+          return "A puzzle with this name already exists";
       };
       if (v instanceof Types.DuplicateFEN) {
-          return "Duplicate FEN";
+          return "A puzzle with this FEN already exists";
       };
-      throw new Error("Failed pattern match at Render (line 71, column 13 - line 75, column 34): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Render (line 71, column 13 - line 75, column 58): " + [ v.constructor.name ]);
   };
   exports["render"] = render;
   exports["alertText"] = alertText;

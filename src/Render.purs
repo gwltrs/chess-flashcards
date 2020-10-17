@@ -69,10 +69,10 @@ menuButton text action =
 
 alertText :: Alert -> String
 alertText = case _ of
-  MissingNameOrFEN -> "Missing name and/or FEN"
+  MissingNameOrFEN -> "Empty field(s): provide a name and FEN for the new puzzle"
   InvalidFEN -> "Invalid FEN"
-  DuplicateName -> "Duplicate name"
-  DuplicateFEN -> "Duplicate FEN"
+  DuplicateName -> "A puzzle with this name already exists"
+  DuplicateFEN -> "A puzzle with this FEN already exists"
 
 boardIsVisible :: State -> Boolean
 boardIsVisible state = 
