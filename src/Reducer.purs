@@ -18,8 +18,11 @@ import Data.Ord (max)
 import Data.Show (show)
 import Data.Semigroup ((<>))
 import Data.Semiring (add)
+import Data.String.Common (localeCompare)
+import Data.Array (sortBy)
 
 import Types (Action(..), Alert(..), Puzzle, State, View(..))
+import Constants (firstBox)
 import Chess (fenIsValid, sanitizeFEN)
 
 reducer :: State -> Action -> State
@@ -52,6 +55,20 @@ reducer state action =
       state { view = MainMenu "" "" }
     { act: AddMoveToNewPuzzle move, vw: CreatingPuzzle name fen _ } ->
       state { view = CreatingPuzzle name fen (Just move) }
+    { act: SavePuzzle, vw: CreatingPuzzle name fen (Just move) } ->
+      let
+        newPuzzle = {
+          name: name,
+          fen: fen,
+          move: move,
+          box: firstBox,
+          lastDrilledAt: 0
+        }
+        comparePuzzles l r =
+          localeCompare l.name r.name
+          
+      in
+        state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
     { act: _, vw: _ } ->
       state
 

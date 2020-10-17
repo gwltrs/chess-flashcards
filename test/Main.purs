@@ -11,6 +11,7 @@ import Test.Unit.Main (runTest)
 import Test.Unit.Assert as Assert
 
 import Types (Action(..), Name, FEN, Move, View(..), Alert(..), Puzzle)
+import Constants (firstBox)
 import Reducer (reducer)
 
 main :: Effect Unit
@@ -310,8 +311,8 @@ ohcPuzzle =
     name: ohcName,
     fen: ohcFEN,
     move: ohcMove,
-    box: 8,
-    lastDrilledAt: 1601324999
+    box: firstBox,
+    lastDrilledAt: 0
   }
 
 twoEndgamePuzzles :: Array Puzzle

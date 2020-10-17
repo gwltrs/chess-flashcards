@@ -4,6 +4,7 @@ import Data.Maybe (Maybe)
 import Data.Eq (class Eq)
 import Data.Show (class Show, show)
 import Data.Semigroup ((<>))
+import Data.Ord (class Ord, Ordering)
 
 type State = 
   { 
