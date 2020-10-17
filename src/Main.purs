@@ -17,6 +17,7 @@ import Types
 import Reducer (reducer)
 import Render (render, alertText)
 import Chess (getMove)
+import File (saveFile)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -58,6 +59,9 @@ handleAction action = do
     CreatePuzzle -> do
       move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
       H.modify_ \newPuzzleState -> reducer newPuzzleState (AddMoveToNewPuzzle move)
+    SaveFile -> do
+      H.liftEffect (saveFile "testFileName.txt" "test file content.")
+      pure unit
     _ ->
       pure unit
 
