@@ -17,7 +17,9 @@ import Types
 import Reducer (reducer)
 import Render (render, alertText)
 import Chess (getMove)
-import File (saveFile)
+import File (saveFile, openFileDialog)
+
+import Effect.Class.Console (log)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -62,6 +64,11 @@ handleAction action = do
     SaveFile -> do
       H.liftEffect (saveFile "testFileName.txt" "test file content.")
       pure unit
+    LoadFile -> do
+      textInFile <- H.liftAff (openFileDialog 0)
+      log "<<<"
+      log textInFile
+      log ">>>"
     _ ->
       pure unit
 

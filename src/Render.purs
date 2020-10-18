@@ -9,9 +9,10 @@ import Data.Maybe (Maybe(..))
 import Data.Semigroup ((<>))
 
 import Types (Action(..), State, View(..), Alert(..))
-  
+import File (openFileDialogInput)
+
 render :: forall m. State -> H.ComponentHTML Action () m
-render state = HH.div_ [menuDiv, chessboardDiv]
+render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
   where 
     menuDiv :: H.ComponentHTML Action () m
     menuDiv = 
