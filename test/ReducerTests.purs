@@ -8,7 +8,6 @@ import Test.Unit.Assert as Assert
 import Data.Maybe (Maybe(..))
 
 import Reducer (reducer)
-
 import TestData
 
 reducerTests :: Free TestF Unit
