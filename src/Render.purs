@@ -21,7 +21,7 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
           HH.div_
             [ 
               menuButton "New" NewFile,
-              menuButton "Load" LoadFile
+              menuButton "Load" OpenFileDialog
             ]
         MainMenu _ _ -> 
           HH.div_
@@ -74,6 +74,7 @@ alertText = case _ of
   InvalidFEN -> "Invalid FEN"
   DuplicateName -> "A puzzle with this name already exists"
   DuplicateFEN -> "A puzzle with this FEN already exists"
+  InvalidFile -> "The selected file doesn't have the expected format"
 
 boardIsVisible :: State -> Boolean
 boardIsVisible state = 

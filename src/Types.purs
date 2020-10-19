@@ -52,7 +52,8 @@ data Alert =
   MissingNameOrFEN |
   InvalidFEN | 
   DuplicateName |
-  DuplicateFEN
+  DuplicateFEN |
+  InvalidFile
 
 derive instance eqAlert :: Eq Alert
 
@@ -62,10 +63,12 @@ instance showAlert :: Show Alert where
     InvalidFEN -> "InvalidFEN"
     DuplicateName -> "DuplicateName"
     DuplicateFEN -> "DuplicateFEN"
+    InvalidFile -> "InvalidFile"
 
 data Action = 
   NewFile | 
-  LoadFile | 
+  OpenFileDialog |
+  LoadFile String | 
   SaveFile | 
   Review | 
   UpdatePuzzleName Name |

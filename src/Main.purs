@@ -19,8 +19,6 @@ import Render (render, alertText)
 import Chess (getMove)
 import File (saveFile, openFileDialog)
 
-import Effect.Class.Console (log)
-
 main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
@@ -62,13 +60,11 @@ handleAction action = do
       move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
       H.modify_ \newPuzzleState -> reducer newPuzzleState (AddMoveToNewPuzzle move)
     SaveFile -> do
-      H.liftEffect (saveFile "testFileName.txt" "test file content.")
+      H.liftEffect (saveFile "chess-flashcards-data.txt" "test file content.")
       pure unit
-    LoadFile -> do
+    OpenFileDialog -> do
       textInFile <- H.liftAff openFileDialog
-      log "<<<"
-      log textInFile
-      log ">>>"
+      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile)
     _ ->
       pure unit
 
