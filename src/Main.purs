@@ -65,7 +65,7 @@ handleAction action = do
       H.liftEffect (saveFile "testFileName.txt" "test file content.")
       pure unit
     LoadFile -> do
-      textInFile <- H.liftAff (openFileDialog 0)
+      textInFile <- H.liftAff openFileDialog
       log "<<<"
       log textInFile
       log ">>>"

@@ -16,26 +16,24 @@ exports.saveFile = function (name) {
 };
 
 let didFileInputButtonAlreadyClick = false;
-exports.openFileDialogImpl = function (unit) {
-  return function () {
-    return new Promise((res, rej) => {
-      const fileInput = document.getElementById("fileInput");
-      if (!didFileInputButtonAlreadyClick) {
-        didFileInputButtonAlreadyClick = true;
-        fileInput.addEventListener("change", handleFiles);
+exports.openFileDialogImpl = function () {
+  return new Promise((res, rej) => {
+    const fileInput = document.getElementById("fileInput");
+    if (!didFileInputButtonAlreadyClick) {
+      didFileInputButtonAlreadyClick = true;
+      fileInput.addEventListener("change", handleFiles);
+    }
+    function handleFiles() {
+      const file = this.files[0];
+      const fileReader = new FileReader();
+      fileReader.onload = function(e) {
+        const text = fileReader.result;
+        res(text);
       }
-      function handleFiles() {
-        const file = this.files[0];
-        const fileReader = new FileReader();
-        fileReader.onload = function(e) {
-          const text = fileReader.result;
-          res(text);
-        }
-        if (file instanceof Blob) {
-          fileReader.readAsText(file);
-        }
+      if (file instanceof Blob) {
+        fileReader.readAsText(file);
       }
-      fileInput.click();
-    }); 
-  };
+    }
+    fileInput.click();
+  }); 
 };

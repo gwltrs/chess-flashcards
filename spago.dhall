@@ -9,6 +9,7 @@ You can edit this file as you like.
   , "css"
   , "effect"
   , "halogen"
+  , "halogen-css"
   , "psci-support"
   , "spec"
   , "test-unit"
