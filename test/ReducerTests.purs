@@ -265,8 +265,22 @@ reducerTests = suite "Reducer" do
   test "User tries to load an invalid file" do
 
     Assert.equal 
-      { puzzles: [endgamePuzzle1, endgamePuzzle2, ohcPuzzle { name = "z" }], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+      { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
       (reducer 
-        { puzzles: [endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: CreatingPuzzle "z" ohcFEN (Just ohcMove), alert: Nothing }
-        SavePuzzle
+        { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+        (LoadFile "")
+      )
+    
+    Assert.equal 
+      { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
+      (reducer 
+        { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+        (LoadFile "{}")
+      )
+
+    Assert.equal 
+      { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
+      (reducer 
+        { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+        (LoadFile "[{'nme':'asdf','fen':'asdfsf','move':-123,'box':-1,'laaasssstDrilledAt':false}]")
       )
