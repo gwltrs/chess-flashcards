@@ -283,3 +283,22 @@ reducerTests = suite "Reducer" do
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
         (LoadFile "[{'nme':'asdf','fen':'asdfsf','move':-123,'box':-1,'laaasssstDrilledAt':false}]")
       )
+
+  test "User loads a valid file" do
+
+    Assert.equal 
+      { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+      (reducer 
+        { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+        (LoadFile "[]")
+      )
+
+    -- Going to hold off on complex positive test case since we also need to test review stack generation
+  
+
+    -- Assert.equal 
+    --   { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Nothing }
+    --   (reducer 
+    --     { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+    --     (LoadFile twoEndgamePuzzlesJSON)
+    --   )

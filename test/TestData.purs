@@ -72,3 +72,23 @@ openGamePuzzle =
 
 twoEndgamePuzzles :: Array Puzzle
 twoEndgamePuzzles = [endgamePuzzle1, endgamePuzzle2]
+
+twoEndgamePuzzlesJSON :: String
+twoEndgamePuzzlesJSON = """
+  [
+    { 
+      name: "endgame 1",
+      fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
+      move: "d7d8k",
+      box: 2,
+      lastDrilledAt: 1601324525
+    },
+    { 
+      name: "endgame 2",
+      fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
+      move: "g6g7",
+      box: 4,
+      lastDrilledAt: 1601324534
+    }
+  ]
+"""

@@ -11,6 +11,7 @@ You can edit this file as you like.
   , "halogen"
   , "halogen-css"
   , "psci-support"
+  , "simple-json"
   , "spec"
   , "test-unit"
   ]

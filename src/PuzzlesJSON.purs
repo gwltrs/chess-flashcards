@@ -1,6 +1,7 @@
 module PuzzlesJSON where
 
 import Data.Maybe (Maybe(..))
+import Simple.JSON (readJSON, writeJSON)
 
 import Types (Puzzle)
 
