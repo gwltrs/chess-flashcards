@@ -4,7 +4,7 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
-import Data.Array (elemIndex, filter, mapMaybe)
+import Data.Array (elemIndex, filter, mapMaybe, sortBy)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
@@ -19,11 +19,11 @@ import Data.Show (show)
 import Data.Semigroup ((<>))
 import Data.Semiring (add)
 import Data.String.Common (localeCompare)
-import Data.Array (sortBy)
 
 import Types (Action(..), Alert(..), Puzzle, State, View(..))
 import Constants (firstBox)
 import Chess (fenIsValid, sanitizeFEN)
+import PuzzlesJSON (parsePuzzlesJSON)
 
 reducer :: State -> Action -> State
 reducer state action =
@@ -67,6 +67,12 @@ reducer state action =
           localeCompare l.name r.name
       in
         state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
+    { act: LoadFile fileString, vw: LoadingFile } ->
+      case parsePuzzlesJSON fileString of
+        Just puzzles ->
+          state { puzzles = puzzles, view = MainMenu "" "" }
+        Nothing -> 
+          state { alert = Just InvalidFile } 
     { act: _, vw: _ } ->
       state
 

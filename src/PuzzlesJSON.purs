@@ -2,6 +2,7 @@ module PuzzlesJSON where
 
 import Data.Maybe (Maybe(..))
 import Simple.JSON (readJSON, writeJSON)
+import Data.Either (Either(..))
 
 import Types (Puzzle)
 
@@ -10,8 +11,16 @@ import Types (Puzzle)
 -- defining these first are necessary for implementing
 -- roundtrip tests in a TDD sequence (writing tests first).
 
+asdf = readJSON
+
 makePuzzlesJSON :: Array Puzzle -> String
-makePuzzlesJSON puzzles = ""
+makePuzzlesJSON puzzles = 
+  writeJSON puzzles
 
 parsePuzzlesJSON :: String -> Maybe (Array Puzzle)
-parsePuzzlesJSON jsonString = Nothing
+parsePuzzlesJSON jsonString =
+  case readJSON jsonString of
+    Right (r :: Array Puzzle) -> 
+      Just r
+    Left err -> 
+      Nothing
