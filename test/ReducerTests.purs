@@ -309,3 +309,19 @@ reducerTests = suite "Reducer" do
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
         (LoadFile fourAssortedTimestampPuzzlesJSON 1_000_000_000)
       )
+
+  test "User tries to review but no drills up for review" do
+
+    Assert.equal 
+      { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Just NoDrillsForReview }
+      (reducer 
+        { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Nothing }
+        Review
+      )
+
+    Assert.equal 
+      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Just NoDrillsForReview }
+      (reducer 
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Nothing }
+        Review
+      )
