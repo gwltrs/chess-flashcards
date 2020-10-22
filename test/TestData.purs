@@ -101,32 +101,32 @@ fourAssortedTimestampPuzzlesJSON :: String
 fourAssortedTimestampPuzzlesJSON = """
   [
     { 
-      name: "1",
-      fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
-      move: "e2e4",
-      box: 1,
-      lastDrilledAt: 999916600
+      "name": "1",
+      "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+      "move": "e2e4",
+      "box": 1,
+      "lastDrilledAt": 999910600
     },
     { 
-      name: "2",
-      fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
-      move: "g1f3",
-      box: 8,
-      lastDrilledAt: 999741800
+      "name": "2",
+      "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
+      "move": "g1f3",
+      "box": 8,
+      "lastDrilledAt": 999307800
     },
     { 
-      name: "3",
-      fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
-      move: "f1b5",
-      box: 4,
-      lastDrilledAt: 999653400
+      "name": "3",
+      "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
+      "move": "f1b5",
+      "box": 4,
+      "lastDrilledAt": 999655400
     },
     { 
-      name: "4",
-      fen: "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
-      move: "d2d3",
-      box: 2,
-      lastDrilledAt: 999829200
+      "name": "4",
+      "fen": "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
+      "move": "d2d3",
+      "box": 2,
+      "lastDrilledAt": 999825200
     }
   ]
 """
@@ -139,27 +139,27 @@ fourAssortedTimestampPuzzles =
       fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
       move: "e2e4",
       box: 1,
-      lastDrilledAt: 999916600
+      lastDrilledAt: 999910600
     },
     { 
       name: "2",
       fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
       move: "g1f3",
       box: 8,
-      lastDrilledAt: 999741800
+      lastDrilledAt: 999307800
     },
     { 
       name: "3",
       fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
       move: "f1b5",
       box: 4,
-      lastDrilledAt: 999653400
+      lastDrilledAt: 999655400
     },
     { 
       name: "4",
       fen: "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
       move: "d2d3",
       box: 2,
-      lastDrilledAt: 999829200
+      lastDrilledAt: 999825200
     }
   ]

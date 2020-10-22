@@ -1,5 +1,6 @@
 module Reducer where
 
+import Prelude ((-), (>), compare)
 import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
@@ -17,10 +18,10 @@ import Data.Foldable (foldr)
 import Data.Ord (max)
 import Data.Show (show)
 import Data.Semigroup ((<>))
-import Data.Semiring (add)
+import Data.Semiring (add, (*))
 import Data.String.Common (localeCompare)
 
-import Types (Action(..), Alert(..), Puzzle, State, View(..))
+import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds)
 import Constants (firstBox)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
@@ -70,7 +71,10 @@ reducer state action =
     { act: LoadFile fileString currentTimestamp, vw: LoadingFile } ->
       case parsePuzzlesJSON fileString of
         Just puzzles ->
-          state { puzzles = puzzles, view = MainMenu "" "" }
+          state { 
+            puzzles = puzzles, 
+            reviewStack = (generateReviewStack currentTimestamp puzzles),
+            view = MainMenu "" "" }
         Nothing -> 
           state { alert = Just InvalidFile } 
     { act: _, vw: _ } ->
@@ -106,3 +110,14 @@ incrementName puzzles name =
               # (foldr max 0)
       _ -> 
         name
+
+generateReviewStack :: TimestampSeconds -> Array Puzzle -> Array Name
+generateReviewStack nowSeconds puzzles =
+  let
+    secondsInADay = 60 * 60 * 24
+  in
+    puzzles
+      # (map \p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
+      # (filter \tuple -> tuple.overdue > 0)
+      # (sortBy \l r -> compare r.overdue l.overdue)
+      # (map \tuple2 -> tuple2.name)
