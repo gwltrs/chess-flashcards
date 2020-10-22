@@ -1,6 +1,6 @@
 module TestData where
 
-import Types (Action(..), Name, FEN, Move, View(..), Alert(..), Puzzle)
+import Types (FEN, Move, Name, Puzzle)
 import Constants (firstBox)
 
 ohcFEN :: FEN
@@ -92,3 +92,74 @@ twoEndgamePuzzlesJSON = """
     }
   ]
 """
+
+-- When at 1_000_000_000 TimestampSeconds
+fourAssortedTimestampPuzzlesExpectedReviewStack :: Array Name
+fourAssortedTimestampPuzzlesExpectedReviewStack = ["1", "4", "2"]
+
+fourAssortedTimestampPuzzlesJSON :: String
+fourAssortedTimestampPuzzlesJSON = """
+  [
+    { 
+      name: "1",
+      fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+      move: "e2e4",
+      box: 1,
+      lastDrilledAt: 999916600
+    },
+    { 
+      name: "2",
+      fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
+      move: "g1f3",
+      box: 8,
+      lastDrilledAt: 999741800
+    },
+    { 
+      name: "3",
+      fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
+      move: "f1b5",
+      box: 4,
+      lastDrilledAt: 999653400
+    },
+    { 
+      name: "4",
+      fen: "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
+      move: "d2d3",
+      box: 2,
+      lastDrilledAt: 999829200
+    }
+  ]
+"""
+
+fourAssortedTimestampPuzzles :: Array Puzzle
+fourAssortedTimestampPuzzles = 
+  [
+    { 
+      name: "1",
+      fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
+      move: "e2e4",
+      box: 1,
+      lastDrilledAt: 999916600
+    },
+    { 
+      name: "2",
+      fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
+      move: "g1f3",
+      box: 8,
+      lastDrilledAt: 999741800
+    },
+    { 
+      name: "3",
+      fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
+      move: "f1b5",
+      box: 4,
+      lastDrilledAt: 999653400
+    },
+    { 
+      name: "4",
+      fen: "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
+      move: "d2d3",
+      box: 2,
+      lastDrilledAt: 999829200
+    }
+  ]

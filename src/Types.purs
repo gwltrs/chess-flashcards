@@ -20,7 +20,7 @@ type Puzzle =
     fen :: FEN,
     move :: Move,
     box :: Days,
-    lastDrilledAt :: Seconds
+    lastDrilledAt :: TimestampSeconds
   }
 
 type Name = String
@@ -33,7 +33,7 @@ type Move = String
 
 type Days = Int
 
-type Seconds = Int
+type TimestampSeconds = Int
 
 data View = 
   LoadingFile | 
@@ -68,7 +68,7 @@ instance showAlert :: Show Alert where
 data Action = 
   NewFile | 
   OpenFileDialog |
-  LoadFile String | 
+  LoadFile String TimestampSeconds | 
   SaveFile | 
   Review | 
   UpdatePuzzleName Name |

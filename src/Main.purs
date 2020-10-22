@@ -64,7 +64,7 @@ handleAction action = do
       pure unit
     OpenFileDialog -> do
       textInFile <- H.liftAff openFileDialog
-      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile)
+      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile 9001)
     _ ->
       pure unit
 

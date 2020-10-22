@@ -67,7 +67,7 @@ reducer state action =
           localeCompare l.name r.name
       in
         state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
-    { act: LoadFile fileString, vw: LoadingFile } ->
+    { act: LoadFile fileString currentTimestamp, vw: LoadingFile } ->
       case parsePuzzlesJSON fileString of
         Just puzzles ->
           state { puzzles = puzzles, view = MainMenu "" "" }

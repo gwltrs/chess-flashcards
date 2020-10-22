@@ -267,21 +267,21 @@ reducerTests = suite "Reducer" do
       { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
       (reducer 
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
-        (LoadFile "")
+        (LoadFile "" 9001)
       )
     
     Assert.equal 
       { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
       (reducer 
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
-        (LoadFile "{}")
+        (LoadFile "{}" 9001)
       )
 
     Assert.equal 
       { puzzles: [], reviewStack: [], view: LoadingFile, alert: Just InvalidFile }
       (reducer 
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
-        (LoadFile "[{'nme':'asdf','fen':'asdfsf','move':-123,'box':-1,'laaasssstDrilledAt':false}]")
+        (LoadFile "[{'nme':'asdf','fen':'asdfsf','move':-123,'box':-1,'laaasssstDrilledAt':false}]" 12341234)
       )
 
   test "User loads a valid file" do
@@ -290,15 +290,22 @@ reducerTests = suite "Reducer" do
       { puzzles: [], reviewStack: [], view: MainMenu "" "", alert: Nothing }
       (reducer 
         { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
-        (LoadFile "[]")
+        (LoadFile "[]" 9001)
       )
 
-    -- Going to hold off on complex positive test case since we also need to test review stack generation
-  
+    -- The following test(s) not only assert the JSON-parsing logic but also the generation of the review stack.
+    -- The review stack is only generated when the file is loaded.
+    -- The review stack should be sorted descending based on how "overdue" the puzzle is for review
+    -- Puzzles are added to the review stack if: currentTimestamp > (puzzle.lastDrilledAt) 
 
-    -- Assert.equal 
-    --   { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Nothing }
-    --   (reducer 
-    --     { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
-    --     (LoadFile twoEndgamePuzzlesJSON)
-    --   )
+    Assert.equal 
+      { 
+        puzzles: fourAssortedTimestampPuzzles, 
+        reviewStack: fourAssortedTimestampPuzzlesExpectedReviewStack, 
+        view: MainMenu "" "", 
+        alert: Nothing 
+      }
+      (reducer 
+        { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+        (LoadFile fourAssortedTimestampPuzzlesJSON 1_000_000_000)
+      )
