@@ -1,10 +1,13 @@
 module Main where
 
-import Prelude (Unit, bind, unit, discard)
+import Prelude (Unit, bind, unit, discard, (/))
 
 import Data.Maybe (Maybe(..))
+import Data.Function ((#))
 import Effect (Effect)
+import Effect.Now (now)
 import Effect.Aff.Class (class MonadAff)
+import Data.DateTime.Instant (unInstant)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
@@ -12,6 +15,9 @@ import Halogen.VDom.Driver (runUI)
 import Web.HTML (window)
 import Web.HTML.Window (alert)
 import Control.Applicative (pure)
+import Data.Functor (map)
+import Data.Newtype (unwrap)
+import Data.Int (round)
 
 import Types
 import Reducer (reducer)
@@ -64,7 +70,12 @@ handleAction action = do
       pure unit
     OpenFileDialog -> do
       textInFile <- H.liftAff openFileDialog
-      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile 9001)
+      nowSeconds <- H.liftEffect (now 
+        # map unInstant 
+        # map unwrap 
+        # map (\x -> x / 1000.0)
+        # map round)
+      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile nowSeconds)
     _ ->
       pure unit
 
