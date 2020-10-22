@@ -11,8 +11,6 @@ import Types (Puzzle)
 -- defining these first are necessary for implementing
 -- roundtrip tests in a TDD sequence (writing tests first).
 
-asdf = readJSON
-
 makePuzzlesJSON :: Array Puzzle -> String
 makePuzzlesJSON puzzles = 
   writeJSON puzzles
