@@ -4,7 +4,7 @@ import Data.Maybe (Maybe)
 import Data.Eq (class Eq)
 import Data.Show (class Show, show)
 import Data.Semigroup ((<>))
-import Data.Ord (class Ord, Ordering)
+--import Data.Ord (class Ord, Ordering)
 
 type State = 
   { 
@@ -53,7 +53,8 @@ data Alert =
   InvalidFEN | 
   DuplicateName |
   DuplicateFEN |
-  InvalidFile
+  InvalidFile |
+  NoDrillsForReview
 
 derive instance eqAlert :: Eq Alert
 
@@ -64,6 +65,7 @@ instance showAlert :: Show Alert where
     DuplicateName -> "DuplicateName"
     DuplicateFEN -> "DuplicateFEN"
     InvalidFile -> "InvalidFile"
+    NoDrillsForReview -> "NoDrillsForReview"
 
 data Action = 
   NewFile | 
