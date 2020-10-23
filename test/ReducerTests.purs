@@ -354,3 +354,45 @@ reducerTests = suite "Reducer" do
         }
         Review
       )
+
+  test "User continues reviewing puzzles" do
+
+    -- Should simply grab the title of the puzzle at review stack index 0.
+    -- Puzzles aren't removed from the review stack until they are attempted.
+
+    -- Not testing use case where the move hasn't been made since the 
+    -- save button is disabled when the move hasn't been made yet.
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle], 
+        reviewStack: ["Open Game"], 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: ["Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          alert: Nothing
+        }
+        Review
+      )
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
+        reviewStack: ["Open Game", endgamePuzzle1.name], 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
+          reviewStack: ["Open Game", endgamePuzzle1.name], 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          alert: Nothing
+        }
+        Review
+      )
