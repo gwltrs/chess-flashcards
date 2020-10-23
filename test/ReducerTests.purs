@@ -325,3 +325,32 @@ reducerTests = suite "Reducer" do
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Nothing }
         Review
       )
+  
+  test "User starts reviewing puzzles" do
+
+    -- Should simply grab the title of the puzzle at review stack index 0.
+    -- Puzzles aren't removed from the review stack until they are attempted.
+
+    Assert.equal 
+      { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: ReviewingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+      (reducer 
+        { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: MainMenu "a" "b", alert: Nothing }
+        Review
+      )
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle], 
+        reviewStack: [ohcName, "Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: [ohcName, "Open Game"], 
+          view: MainMenu "" "", 
+          alert: Nothing
+        }
+        Review
+      )

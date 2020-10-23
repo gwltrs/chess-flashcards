@@ -45,6 +45,10 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
               ],
               menuButton "Save" SavePuzzle
             ]
+        ReviewingPuzzle _ _ _ ->
+          HH.div_
+            [
+            ]
 
     chessboardDiv :: H.ComponentHTML Action () m
     chessboardDiv = 
@@ -81,4 +85,5 @@ boardIsVisible :: State -> Boolean
 boardIsVisible state = 
   case state.view of 
     CreatingPuzzle _ _ _ -> true
+    ReviewingPuzzle _ _ _ -> true
     _ -> false
