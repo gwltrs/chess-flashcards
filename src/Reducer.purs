@@ -1,11 +1,11 @@
 module Reducer where
 
-import Prelude ((-), (>), compare)
+import Prelude ((-), (>), compare, (>>=))
 import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
-import Data.Array (elemIndex, filter, mapMaybe, sortBy, null)
+import Data.Array (elemIndex, filter, mapMaybe, sortBy, head)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
@@ -14,7 +14,7 @@ import Data.String.Regex.Flags (RegexFlags(..))
 import Data.Either (fromRight)
 import Partial.Unsafe (unsafePartial)
 import Data.Int (fromString)
-import Data.Foldable (foldr)
+import Data.Foldable (foldr, find)
 import Data.Ord (max)
 import Data.Show (show)
 import Data.Semigroup ((<>))
@@ -77,11 +77,18 @@ reducer state action =
             view = MainMenu "" "" }
         Nothing -> 
           state { alert = Just InvalidFile }
-    { act: Review, vw: MainMenu _ _ } ->
-      if null state.reviewStack then
-        state { alert = Just NoPuzzlesForReview }
-      else
-        state
+    { act: Review, vw: _ } ->
+      case head state.reviewStack >>= getPuzzleByName state.puzzles of
+        Just puzzleForReview ->
+          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing }
+        Nothing ->
+          case state.view of
+            MainMenu _ _ ->
+              state { alert = Just NoPuzzlesForReview }
+            ReviewingPuzzle _ _ _ ->
+              state { alert = Just AllPuzzlesReviewed }
+            _ ->
+              state
     { act: _, vw: _ } ->
       state
 
@@ -126,3 +133,8 @@ generateReviewStack nowSeconds puzzles =
       # (filter \tuple -> tuple.overdue > 0)
       # (sortBy \l r -> compare r.overdue l.overdue)
       # (map \tuple2 -> tuple2.name)
+
+-- Defined with this param order for convenient use with bind
+getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
+getPuzzleByName puzzles name = 
+  find (\puzzle -> puzzle.name == name) puzzles
