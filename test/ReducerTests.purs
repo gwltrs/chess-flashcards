@@ -310,7 +310,7 @@ reducerTests = suite "Reducer" do
         (LoadFile fourAssortedTimestampPuzzlesJSON 1_000_000_000)
       )
 
-  test "User tries to review but no drills up for review" do
+  test "User tries to review but no puzzles are up for review" do
 
     Assert.equal 
       { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Just NoDrillsForReview }

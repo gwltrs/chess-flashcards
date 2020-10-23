@@ -5,7 +5,7 @@ import Data.Maybe (Maybe(..), isJust)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
-import Data.Array (elemIndex, filter, mapMaybe, sortBy)
+import Data.Array (elemIndex, filter, mapMaybe, sortBy, null)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
@@ -76,7 +76,12 @@ reducer state action =
             reviewStack = (generateReviewStack currentTimestamp puzzles),
             view = MainMenu "" "" }
         Nothing -> 
-          state { alert = Just InvalidFile } 
+          state { alert = Just InvalidFile }
+    { act: Review, vw: MainMenu _ _ } ->
+      if null state.reviewStack then
+        state { alert = Just NoDrillsForReview }
+      else
+        state
     { act: _, vw: _ } ->
       state
 
