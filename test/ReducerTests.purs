@@ -313,14 +313,14 @@ reducerTests = suite "Reducer" do
   test "User tries to review but no puzzles are up for review" do
 
     Assert.equal 
-      { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Just NoDrillsForReview }
+      { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Just NoPuzzlesForReview }
       (reducer 
         { puzzles: [], reviewStack: [], view: MainMenu "asdf" "", alert: Nothing }
         Review
       )
 
     Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Just NoDrillsForReview }
+      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Just NoPuzzlesForReview }
       (reducer 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "" "", alert: Nothing }
         Review
@@ -391,6 +391,25 @@ reducerTests = suite "Reducer" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: ["Open Game", endgamePuzzle1.name], 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          alert: Nothing
+        }
+        Review
+      )
+
+  test "User finishes reviewing all the puzzles" do
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
+        reviewStack: [], 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+        alert: Just AllPuzzlesReviewed
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
+          reviewStack: [], 
           view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
           alert: Nothing
         }

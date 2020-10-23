@@ -79,7 +79,8 @@ alertText = case _ of
   DuplicateName -> "A puzzle with this name already exists"
   DuplicateFEN -> "A puzzle with this FEN already exists"
   InvalidFile -> "The selected file doesn't have the expected format"
-  NoDrillsForReview -> "No drills are up for review at this time"
+  NoPuzzlesForReview -> "No puzzles are up for review at this time"
+  AllPuzzlesReviewed -> "You completed all the puzzles that are up for review"
 
 boardIsVisible :: State -> Boolean
 boardIsVisible state = 

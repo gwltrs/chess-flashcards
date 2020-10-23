@@ -79,7 +79,7 @@ reducer state action =
           state { alert = Just InvalidFile }
     { act: Review, vw: MainMenu _ _ } ->
       if null state.reviewStack then
-        state { alert = Just NoDrillsForReview }
+        state { alert = Just NoPuzzlesForReview }
       else
         state
     { act: _, vw: _ } ->

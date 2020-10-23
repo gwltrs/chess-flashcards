@@ -56,7 +56,8 @@ data Alert =
   DuplicateName |
   DuplicateFEN |
   InvalidFile |
-  NoDrillsForReview
+  NoPuzzlesForReview |
+  AllPuzzlesReviewed
 
 derive instance eqAlert :: Eq Alert
 
@@ -67,7 +68,8 @@ instance showAlert :: Show Alert where
     DuplicateName -> "DuplicateName"
     DuplicateFEN -> "DuplicateFEN"
     InvalidFile -> "InvalidFile"
-    NoDrillsForReview -> "NoDrillsForReview"
+    NoPuzzlesForReview -> "NoPuzzlesForReview"
+    AllPuzzlesReviewed -> "AllPuzzlesReviewed"
 
 data Action = 
   NewFile | 
