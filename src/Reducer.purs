@@ -80,12 +80,12 @@ reducer state action =
     { act: Review, vw: _ } ->
       case head state.reviewStack >>= getPuzzleByName state.puzzles of
         Just puzzleForReview ->
-          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing }
+          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing true }
         Nothing ->
           case state.view of
             MainMenu _ _ ->
               state { alert = Just NoPuzzlesForReview }
-            ReviewingPuzzle _ _ _ ->
+            ReviewingPuzzle _ _ _ _ ->
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state

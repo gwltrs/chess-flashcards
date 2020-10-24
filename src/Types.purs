@@ -39,7 +39,9 @@ data View =
   LoadingFile | 
   MainMenu Name FEN | 
   CreatingPuzzle Name FEN (Maybe Move) |
-  ReviewingPuzzle Name FEN (Maybe Move)
+  ReviewingPuzzle Name FEN (Maybe Move) IsFirstAttempt
+
+type IsFirstAttempt = Boolean
 
 derive instance eqView :: Eq View
 
@@ -48,7 +50,7 @@ instance showView :: Show View where
     LoadingFile -> "LoadingFile"
     MainMenu puzzleName fen -> "MainMenu " <> show puzzleName <> " " <> show fen
     CreatingPuzzle puzzleName fen move -> "CreatingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move
-    ReviewingPuzzle puzzleName fen move -> "ReviewingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move
+    ReviewingPuzzle puzzleName fen move isFirstAttempt -> "ReviewingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move <> show isFirstAttempt
 
 data Alert = 
   MissingNameOrFEN |
@@ -77,6 +79,7 @@ data Action =
   LoadFile String TimestampSeconds | 
   SaveFile | 
   Review | 
+  AttemptPuzzle Move |
   UpdatePuzzleName Name |
   UpdateFEN FEN |
   CreatePuzzle |

@@ -83,5 +83,5 @@ handleAction action = do
 boardFEN :: State -> FEN
 boardFEN state = case state.view of
   CreatingPuzzle _ fen _ -> fen
-  ReviewingPuzzle _ fen _ -> fen
+  ReviewingPuzzle _ fen _ _ -> fen
   _ -> ""

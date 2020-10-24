@@ -332,7 +332,7 @@ reducerTests = suite "Reducer" do
     -- Puzzles aren't removed from the review stack until they are attempted.
 
     Assert.equal 
-      { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: ReviewingPuzzle "Open Game" openGameFEN Nothing, alert: Nothing }
+      { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: ReviewingPuzzle "Open Game" openGameFEN Nothing true, alert: Nothing }
       (reducer 
         { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: MainMenu "a" "b", alert: Nothing }
         Review
@@ -342,7 +342,7 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN Nothing, 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing true, 
         alert: Nothing
       }
       (reducer 
@@ -367,14 +367,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle "Open Game" openGameFEN Nothing, 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing true, 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
           alert: Nothing
         }
         Review
@@ -384,14 +384,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: ["Open Game", endgamePuzzle1.name], 
-        view: ReviewingPuzzle "Open Game" openGameFEN Nothing, 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing true, 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: ["Open Game", endgamePuzzle1.name], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
           alert: Nothing
         }
         Review
@@ -403,14 +403,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: [], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
         alert: Just AllPuzzlesReviewed
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: [], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove), 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
           alert: Nothing
         }
         Review
