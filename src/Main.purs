@@ -24,6 +24,7 @@ import Reducer (reducer)
 import Render (render, alertText)
 import Chess (getMove)
 import File (saveFile, openFileDialog)
+import PuzzlesJSON (makePuzzlesJSON)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -66,7 +67,8 @@ handleAction action = do
       move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
       H.modify_ \newPuzzleState -> reducer newPuzzleState (AddMoveToNewPuzzle move)
     SaveFile -> do
-      H.liftEffect (saveFile "chess-flashcards-data.txt" "test file content.")
+      state <- H.get
+      H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON state.puzzles))
       pure unit
     OpenFileDialog -> do
       textInFile <- H.liftAff openFileDialog
@@ -82,4 +84,5 @@ handleAction action = do
 boardFEN :: State -> FEN
 boardFEN state = case state.view of
   CreatingPuzzle _ fen _ -> fen
+  ReviewingPuzzle _ fen _ -> fen
   _ -> ""
