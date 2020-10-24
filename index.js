@@ -14162,16 +14162,12 @@ var PS = {};
                   })())(function () {
                       if (action instanceof Types.CreatePuzzle) {
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(stateAfterAction))("")))(function (move) {
-                              return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (newPuzzleState) {
-                                  return Reducer.reducer(newPuzzleState)(new Types.AddMoveToNewPuzzle(move));
-                              });
+                              return handleAction(dictMonadAff)(new Types.AddMoveToNewPuzzle(move));
                           });
                       };
                       if (action instanceof Types.SaveFile) {
-                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (state) {
-                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(File.saveFile("chess-flashcards-data.txt")(PuzzlesJSON.makePuzzlesJSON(state.puzzles))))(function () {
-                                  return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
-                              });
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(File.saveFile("chess-flashcards-data.txt")(PuzzlesJSON.makePuzzlesJSON(stateAfterAction.puzzles))))(function () {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
                           });
                       };
                       if (action instanceof Types.OpenFileDialog) {
@@ -14179,9 +14175,7 @@ var PS = {};
                               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Data_Functor.map(Effect.functorEffect)(Data_Int.round)(Data_Functor.map(Effect.functorEffect)(function (x) {
                                   return x / 1000.0;
                               })(Data_Functor.map(Effect.functorEffect)(Data_Newtype.unwrap(Data_Time_Duration.newtypeMilliseconds))(Data_Functor.map(Effect.functorEffect)(Data_DateTime_Instant.unInstant)(Effect_Now.now))))))(function (nowSeconds) {
-                                  return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (stateForFileString) {
-                                      return Reducer.reducer(stateForFileString)(new Types.LoadFile(textInFile, nowSeconds));
-                                  });
+                                  return handleAction(dictMonadAff)(new Types.LoadFile(textInFile, nowSeconds));
                               });
                           });
                       };

@@ -65,10 +65,9 @@ handleAction action = do
   case action of
     CreatePuzzle -> do
       move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
-      H.modify_ \newPuzzleState -> reducer newPuzzleState (AddMoveToNewPuzzle move)
+      handleAction (AddMoveToNewPuzzle move)
     SaveFile -> do
-      state <- H.get
-      H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON state.puzzles))
+      H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON stateAfterAction.puzzles))
       pure unit
     OpenFileDialog -> do
       textInFile <- H.liftAff openFileDialog
@@ -77,7 +76,7 @@ handleAction action = do
         # map unwrap 
         # map (\x -> x / 1000.0)
         # map round)
-      H.modify_ \stateForFileString -> reducer stateForFileString (LoadFile textInFile nowSeconds)
+      handleAction (LoadFile textInFile nowSeconds) 
     _ ->
       pure unit
 
