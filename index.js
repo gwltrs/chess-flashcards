@@ -10062,14 +10062,10 @@ var PS = {};
     };
   };
 
-  let didFileInputButtonAlreadyClick = false;
   exports.openFileDialogImpl = function () {
     return new Promise((res, rej) => {
       const fileInput = document.getElementById("fileInput");
-      if (!didFileInputButtonAlreadyClick) {
-        didFileInputButtonAlreadyClick = true;
-        fileInput.addEventListener("change", handleFiles);
-      }
+      fileInput.addEventListener("change", handleFiles);
       function handleFiles() {
         const file = this.files[0];
         const fileReader = new FileReader();
