@@ -35,6 +35,15 @@ type Days = Int
 
 type TimestampSeconds = Int
 
+-- When a puzzle is attempted, random variance is subtracted from the puzzle's newly-calculated 
+-- last-drilled-at timestamp. The intention is to avoid long-term temporal association between 
+-- puzzles. For example, if I enter 10 checkmate positions into the app in one day, in the future 
+-- those 10 positions will be reviewed on the same day in the same order indefinitely. This will 
+-- continue to happen until some of the 10 are missed in reviews. We avoid this review-mode 
+-- predictability by subtly shifting the timestamp randomly within a range of values. The
+-- timestamp is adjusted: last_drilled_at = last_drilled_at - (variance_factor * box_after_attempt * seconds_in_a_day).
+type VarianceFactor = Number
+
 data View = 
   LoadingFile | 
   MainMenu Name FEN | 
@@ -79,7 +88,7 @@ data Action =
   LoadFile String TimestampSeconds | 
   SaveFile | 
   Review | 
-  AttemptPuzzle Move |
+  AttemptPuzzle Move TimestampSeconds VarianceFactor |
   UpdatePuzzleName Name |
   UpdateFEN FEN |
   CreatePuzzle |

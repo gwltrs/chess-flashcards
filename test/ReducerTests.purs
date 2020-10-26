@@ -415,3 +415,42 @@ reducerTests = suite "Reducer" do
         }
         Review
       )
+
+  test "User makes attempts after the first attempt" do
+
+    -- Puzzles shouldn't be updated for answers (correct or incorrect) after the first attempt.
+    -- Subsequent attempts are enabled for reinforcement on puzzles that have left the user's memory to some degree.
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle], 
+        reviewStack: [ohcName, "Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: [ohcName, "Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing false, 
+          alert: Nothing
+        }
+        (AttemptPuzzle ohcMove 1601324534 0.5) -- Correct
+      )
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle], 
+        reviewStack: [ohcName, "Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: [ohcName, "Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing false, 
+          alert: Nothing
+        }
+        (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
+      )
