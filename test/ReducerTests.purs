@@ -419,7 +419,8 @@ reducerTests = suite "Reducer" do
   test "User makes attempts after the first attempt" do
 
     -- Puzzles shouldn't be updated for answers (correct or incorrect) after the first attempt.
-    -- Subsequent attempts are enabled for reinforcement on puzzles that have left the user's memory to some degree.
+    -- The first attempt is for evaluation. Subsequent attempts are enabled for reinforcement 
+    -- on puzzles that have left the user's memory to some degree.
 
     Assert.equal 
       { 
