@@ -9,6 +9,7 @@ import Data.Maybe (Maybe(..))
 
 import Reducer (reducer)
 import TestData
+import Constants (firstBox)
 
 reducerTests :: Free TestF Unit
 reducerTests = suite "Reducer" do
@@ -454,4 +455,42 @@ reducerTests = suite "Reducer" do
           alert: Nothing
         }
         (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
+      )
+
+  test "User makes wrong move on the first attempt" do
+
+    Assert.equal 
+      { 
+        -- The new timestamp is "now" since the variance factor is 0
+        puzzles: [openGamePuzzle, ohcPuzzle { box = firstBox, lastDrilledAt = 1_000_000_000 }], 
+        reviewStack: ["Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: [ohcName, "Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing true, 
+          alert: Nothing
+        }
+        (AttemptPuzzle "d1d7" 1_000_000_000 0.0)
+      )
+
+    Assert.equal 
+      { 
+        -- The new timestamp is equal to 2_000_000_000 - seconds_in_half_of_a_day
+        puzzles: [endgamePuzzle1 { box = firstBox, lastDrilledAt = 1_999_956_800} , endgamePuzzle2], 
+        reviewStack: [endgamePuzzle2.name], 
+        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just "a1h8") false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: twoEndgamePuzzles, 
+          reviewStack: [endgamePuzzle1.name, endgamePuzzle2.name], 
+          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing true, 
+          alert: Nothing
+        }
+        (AttemptPuzzle "a1h8" 2_000_000_000 0.5)
       )

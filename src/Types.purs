@@ -41,7 +41,7 @@ type TimestampSeconds = Int
 -- those 10 positions will be reviewed on the same day in the same order indefinitely. This will 
 -- continue to happen until some of the 10 are missed in reviews. We avoid this review-mode 
 -- predictability by subtly shifting the timestamp randomly within a range of values. The
--- timestamp is adjusted: last_drilled_at = last_drilled_at - (variance_factor * box_after_attempt * seconds_in_a_day).
+-- timestamp is adjusted: last_drilled_at = last_drilled_at - (round (variance_factor * box_after_attempt * seconds_in_a_day)).
 type VarianceFactor = Number
 
 data View = 
