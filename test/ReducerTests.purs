@@ -518,7 +518,7 @@ reducerTests = suite "Reducer" do
       { 
         -- The new timestamp is "now" since the variance factor is 0.
         -- New box should be capped at 64.
-        puzzles: [openGamePuzzle, ohcPuzzle { box = 64, lastDrilledAt = 2_999_447_040 }], 
+        puzzles: [openGamePuzzle, ohcPuzzle { box = 64, lastDrilledAt = 1_999_447_040 }], 
         reviewStack: ["Open Game"], 
         view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) false, 
         alert: Nothing
@@ -530,5 +530,5 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing true, 
           alert: Nothing
         }
-        (AttemptPuzzle ohcMove 3_000_000_000 0.1)
+        (AttemptPuzzle ohcMove 2_000_000_000 0.1)
       )
