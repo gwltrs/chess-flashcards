@@ -1,11 +1,12 @@
 module Reducer where
 
-import Prelude ((-), (>), compare, (>>=))
-import Data.Maybe (Maybe(..), isJust)
+import Prelude ((-), (>), compare, (>>=), (*))
+import Control.Apply (lift2)
+import Data.Maybe (Maybe(..), isJust, fromMaybe)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
-import Data.Array (elemIndex, filter, mapMaybe, sortBy, head)
+import Data.Array (elemIndex, filter, mapMaybe, sortBy, head, tail, findIndex, (!!), alterAt)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
@@ -13,16 +14,17 @@ import Data.String.Regex (regex, match)
 import Data.String.Regex.Flags (RegexFlags(..))
 import Data.Either (fromRight)
 import Partial.Unsafe (unsafePartial)
-import Data.Int (fromString)
+import Data.Int (fromString, toNumber, round)
 import Data.Foldable (foldr, find)
-import Data.Ord (max)
+import Data.Ord (max, min)
 import Data.Show (show)
 import Data.Semigroup ((<>))
-import Data.Semiring (add, (*))
+import Data.Semiring (add, mul)
 import Data.String.Common (localeCompare)
+import Data.Tuple (Tuple(..), fst, snd)
 
 import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds)
-import Constants (firstBox)
+import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
 
@@ -89,6 +91,40 @@ reducer state action =
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state
+    {
+      act: AttemptPuzzle move now varianceFactor, 
+      vw: ReviewingPuzzle puzzleName fen Nothing true
+    } ->
+      let
+        updateView s = s { view = ReviewingPuzzle puzzleName fen (Just move) false }
+        updateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
+        indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
+        isCorrect = indexInPuzzles
+          >>= (\i -> state.puzzles !! i)
+          # map (\p -> p.move == move)
+        updatePuzzles s = (lift2 Tuple isCorrect indexInPuzzles)
+          >>= (\tup -> alterAt
+                      (snd tup)
+                      (\p -> 
+                        let
+                          newBox = if fst tup then min maxBox (p.box * factorForNextBox) else firstBox
+                        in
+                          Just p {
+                            box = newBox,
+                            lastDrilledAt = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round) })
+                      s.puzzles)
+          # map (\newPuzzles -> s { puzzles = newPuzzles })
+          # fromMaybe s
+      in
+        state
+          # updateView
+          # updateReviewStack
+          # updatePuzzles
+    {
+      act: AttemptPuzzle move _ _, 
+      vw: ReviewingPuzzle puzzleName fen Nothing false
+    } ->
+      state { view = ReviewingPuzzle puzzleName fen (Just move) false }
     { act: _, vw: _ } ->
       state
 
