@@ -23,7 +23,7 @@ import Data.Semiring (add, mul)
 import Data.String.Common (localeCompare)
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds)
+import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor)
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
@@ -59,13 +59,7 @@ reducer state action =
       state { view = CreatingPuzzle name fen (Just move) }
     { act: SavePuzzle, vw: CreatingPuzzle name fen (Just move) } ->
       let
-        newPuzzle = {
-          name: name,
-          fen: fen,
-          move: move,
-          box: firstBox,
-          lastDrilledAt: 0
-        }
+        newPuzzle = { name: name, fen: fen, move: move, box: firstBox, lastDrilledAt: 0 }
         comparePuzzles l r =
           localeCompare l.name r.name
       in
@@ -96,30 +90,21 @@ reducer state action =
       vw: ReviewingPuzzle puzzleName fen Nothing true
     } ->
       let
-        updateView s = s { view = ReviewingPuzzle puzzleName fen (Just move) false }
-        updateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
+        updateStateView s = s { view = ReviewingPuzzle puzzleName fen (Just move) false }
+        updateStateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
         indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
         isCorrect = indexInPuzzles
           >>= (\i -> state.puzzles !! i)
           # map (\p -> p.move == move)
-        updatePuzzles s = (lift2 Tuple isCorrect indexInPuzzles)
-          >>= (\tup -> alterAt
-                      (snd tup)
-                      (\p -> 
-                        let
-                          newBox = if fst tup then min maxBox (p.box * factorForNextBox) else firstBox
-                        in
-                          Just p {
-                            box = newBox,
-                            lastDrilledAt = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round) })
-                      s.puzzles)
-          # map (\newPuzzles -> s { puzzles = newPuzzles })
-          # fromMaybe s
+        updateStatePuzzles s = s { puzzles =
+          (lift2 Tuple isCorrect indexInPuzzles)
+            >>= (\tup -> updatePuzzles (fst tup) (snd tup) now varianceFactor s.puzzles)
+            # fromMaybe s.puzzles }
       in
         state
-          # updateView
-          # updateReviewStack
-          # updatePuzzles
+          # updateStateView
+          # updateStateReviewStack
+          # updateStatePuzzles
     {
       act: AttemptPuzzle move _ _, 
       vw: ReviewingPuzzle puzzleName fen Nothing false
@@ -174,3 +159,12 @@ generateReviewStack nowSeconds puzzles =
 getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
 getPuzzleByName puzzles name = 
   find (\puzzle -> puzzle.name == name) puzzles
+
+updatePuzzles :: Boolean -> Int -> TimestampSeconds -> VarianceFactor -> Array Puzzle -> Maybe (Array Puzzle)
+updatePuzzles isCorrect index now varianceFactor puzzles =
+  let
+    oldBox = (puzzles !! index) # map (\p -> p.box) # fromMaybe 1
+    newBox = if isCorrect then min maxBox (oldBox * factorForNextBox) else firstBox
+    newTimestamp = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round)
+  in
+    alterAt index (\p -> Just p { box = newBox, lastDrilledAt = newTimestamp }) puzzles
