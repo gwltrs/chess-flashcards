@@ -47,8 +47,6 @@ reducer state action =
           state { alert = Just MissingNameOrFEN }
         else if not (fenIsValid fen) then 
           state { alert = Just InvalidFEN }
-        --else if state.puzzles # (map \p -> p.name) # elemIndex trimmedName # isJust then
-        --  state { alert = Just DuplicateName }
         else if state.puzzles # (map \p -> p.fen) # elemIndex sanitizedFEN # isJust then
           state { alert = Just DuplicateFEN }
         else
