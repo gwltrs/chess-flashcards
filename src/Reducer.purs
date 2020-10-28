@@ -114,6 +114,10 @@ reducer state action =
       state
 
 -- Assumes the name is already trimmed at this point
+-- Auto-incrementing the name removes the hassle of duplicate names
+-- "endgame" -> "endgame" if no puzzles already exist
+-- "endgame" -> "endgame #2" if one puzzle already exists with the names "endgame"
+-- "endgame" -> "endgame #3" if two puzzles already exist with the names "endgame" and "endgame #2"
 incrementName :: Array Puzzle -> String -> String
 incrementName puzzles name = 
   let 
@@ -144,6 +148,9 @@ incrementName puzzles name =
       _ -> 
         name
 
+-- Decides which puzzles are "up for review" by looking at the last-drilled-at date and what "box" they are in.
+-- "box" refers to the flashcards-in-boxes spaced repetition system which this app gets inspiration from.
+-- https://en.wikipedia.org/wiki/Leitner_system 
 generateReviewStack :: TimestampSeconds -> Array Puzzle -> Array Name
 generateReviewStack nowSeconds puzzles =
   let
