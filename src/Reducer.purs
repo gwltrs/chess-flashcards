@@ -30,14 +30,14 @@ import PuzzlesJSON (parsePuzzlesJSON)
 
 reducer :: State -> Action -> State
 reducer state action =
-  case { act: action, vw: state.view } of
-    { act: NewFile, vw: _ } ->
+  case Tuple action state.view of
+    Tuple NewFile _ ->
       state { view = MainMenu "" "" }
-    { act: UpdatePuzzleName newName, vw: MainMenu _ currentFEN } ->
+    Tuple (UpdatePuzzleName newName) (MainMenu _ currentFEN) ->
       state { view = MainMenu newName currentFEN }
-    { act: UpdateFEN newFEN, vw: MainMenu currentName _ } ->
+    Tuple (UpdateFEN newFEN) (MainMenu currentName _) ->
       state { view = MainMenu currentName newFEN }
-    { act: CreatePuzzle, vw: MainMenu name fen } ->
+    Tuple CreatePuzzle (MainMenu name fen) ->
       let
         trimmedName = trim name
         trimmedFEN = trim fen
@@ -51,18 +51,18 @@ reducer state action =
           state { alert = Just DuplicateFEN }
         else
           state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) sanitizedFEN Nothing }
-    { act: BackToMain, vw: _ } ->
+    Tuple BackToMain _ ->
       state { view = MainMenu "" "" }
-    { act: AddMoveToNewPuzzle move, vw: CreatingPuzzle name fen _ } ->
+    Tuple (AddMoveToNewPuzzle move) (CreatingPuzzle name fen _) ->
       state { view = CreatingPuzzle name fen (Just move) }
-    { act: SavePuzzle, vw: CreatingPuzzle name fen (Just move) } ->
+    Tuple SavePuzzle (CreatingPuzzle name fen (Just move)) ->
       let
         newPuzzle = { name: name, fen: fen, move: move, box: firstBox, lastDrilledAt: 0 }
         comparePuzzles l r =
           localeCompare l.name r.name
       in
         state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
-    { act: LoadFile fileString currentTimestamp, vw: LoadingFile } ->
+    Tuple (LoadFile fileString currentTimestamp) LoadingFile ->
       case parsePuzzlesJSON fileString of
         Just puzzles ->
           state { 
@@ -71,7 +71,7 @@ reducer state action =
             view = MainMenu "" "" }
         Nothing -> 
           state { alert = Just InvalidFile }
-    { act: Review, vw: _ } ->
+    Tuple Review _ ->
       case head state.reviewStack >>= getPuzzleByName state.puzzles of
         Just puzzleForReview ->
           state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing true }
@@ -83,10 +83,7 @@ reducer state action =
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state
-    {
-      act: AttemptPuzzle move now varianceFactor, 
-      vw: ReviewingPuzzle puzzleName fen Nothing true
-    } ->
+    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing true) ->
       let
         updateStateView s = s { view = ReviewingPuzzle puzzleName fen (Just move) false }
         updateStateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
@@ -103,14 +100,11 @@ reducer state action =
           # updateStateView
           # updateStateReviewStack
           # updateStatePuzzles
-    {
-      act: AttemptPuzzle move _ _, 
-      vw: ReviewingPuzzle puzzleName fen Nothing false
-    } ->
+    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing false) ->
       state { view = ReviewingPuzzle puzzleName fen (Just move) false }
-    { act: Retry, vw: ReviewingPuzzle puzzleName fen (Just move) false } ->
+    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) false) ->
       state { view = ReviewingPuzzle puzzleName fen Nothing false }
-    { act: _, vw: _ } ->
+    Tuple _ _ ->
       state
 
 -- Auto-incrementing the name removes the hassle of duplicate names
