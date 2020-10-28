@@ -92,4 +92,7 @@ data Action =
   CreatePuzzle |
   AddMoveToNewPuzzle Move |
   SavePuzzle |
-  BackToMain
+  BackToMain | 
+  Retry | 
+  ShowTitle | 
+  CopyFEN

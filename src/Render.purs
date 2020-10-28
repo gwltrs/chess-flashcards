@@ -48,6 +48,11 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
         ReviewingPuzzle _ _ _ _ ->
           HH.div_
             [
+              menuButton "Back" BackToMain,
+              menuButton "Retry" Retry,
+              menuButton "Next" Review,
+              menuButton "Show Title" ShowTitle,
+              menuButton "Copy FEN" CopyFEN
             ]
 
     chessboardDiv :: H.ComponentHTML Action () m

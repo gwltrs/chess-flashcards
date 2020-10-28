@@ -664,6 +664,7 @@ var PS = {};
   exports["isNothing"] = isNothing;
   exports["fromJust"] = fromJust;
   exports["functorMaybe"] = functorMaybe;
+  exports["applyMaybe"] = applyMaybe;
   exports["bindMaybe"] = bindMaybe;
   exports["eqMaybe"] = eqMaybe;
 })(PS);
@@ -1098,6 +1099,18 @@ var PS = {};
   };
 
   //------------------------------------------------------------------------------
+  // Non-indexed reads -----------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports["uncons'"] = function (empty) {
+    return function (next) {
+      return function (xs) {
+        return xs.length === 0 ? empty({}) : next(xs[0])(xs.slice(1));
+      };
+    };
+  };
+
+  //------------------------------------------------------------------------------
   // Indexed operations ----------------------------------------------------------
   //------------------------------------------------------------------------------
 
@@ -1119,6 +1132,34 @@ var PS = {};
             if (f(xs[i])) return just(i);
           }
           return nothing;
+        };
+      };
+    };
+  };
+
+  exports._deleteAt = function (just) {
+    return function (nothing) {
+      return function (i) {
+        return function (l) {
+          if (i < 0 || i >= l.length) return nothing;
+          var l1 = l.slice();
+          l1.splice(i, 1);
+          return just(l1);
+        };
+      };
+    };
+  };
+
+  exports._updateAt = function (just) {
+    return function (nothing) {
+      return function (i) {
+        return function (a) {
+          return function (l) {
+            if (i < 0 || i >= l.length) return nothing;
+            var l1 = l.slice();
+            l1[i] = a;
+            return just(l1);
+          };
         };
       };
     };
@@ -1184,6 +1225,12 @@ var PS = {};
   var Data_Function = $PS["Data.Function"];
   var Data_Maybe = $PS["Data.Maybe"];
   var Data_Ordering = $PS["Data.Ordering"];
+  var updateAt = $foreign["_updateAt"](Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  var tail = $foreign["uncons'"](Data_Function["const"](Data_Maybe.Nothing.value))(function (v) {
+      return function (xs) {
+          return new Data_Maybe.Just(xs);
+      };
+  });
   var sortBy = function (comp) {
       return function (xs) {
           var comp$prime = function (x) {
@@ -1222,6 +1269,7 @@ var PS = {};
           });
       };
   };
+  var deleteAt = $foreign["_deleteAt"](Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   var concatMap = Data_Function.flip(Control_Bind.bind(Control_Bind.bindArray));
   var mapMaybe = function (f) {
       return concatMap((function () {
@@ -1230,11 +1278,32 @@ var PS = {};
               return $94(f($95));
           };
       })());
+  };                                                                               
+  var alterAt = function (i) {
+      return function (f) {
+          return function (xs) {
+              var go = function (x) {
+                  var v = f(x);
+                  if (v instanceof Data_Maybe.Nothing) {
+                      return deleteAt(i)(xs);
+                  };
+                  if (v instanceof Data_Maybe.Just) {
+                      return updateAt(i)(v.value0)(xs);
+                  };
+                  throw new Error("Failed pattern match at Data.Array (line 544, column 10 - line 546, column 32): " + [ v.constructor.name ]);
+              };
+              return Data_Maybe.maybe(Data_Maybe.Nothing.value)(go)(index(xs)(i));
+          };
+      };
   };
   exports["fromFoldable"] = fromFoldable;
   exports["singleton"] = singleton;
   exports["head"] = head;
+  exports["tail"] = tail;
+  exports["index"] = index;
   exports["elemIndex"] = elemIndex;
+  exports["findIndex"] = findIndex;
+  exports["alterAt"] = alterAt;
   exports["concatMap"] = concatMap;
   exports["mapMaybe"] = mapMaybe;
   exports["sortBy"] = sortBy;
@@ -6049,7 +6118,25 @@ var PS = {};
           };
       };
   };
+  var min = function (dictOrd) {
+      return function (x) {
+          return function (y) {
+              var v = compare(dictOrd)(x)(y);
+              if (v instanceof Data_Ordering.LT) {
+                  return x;
+              };
+              if (v instanceof Data_Ordering.EQ) {
+                  return x;
+              };
+              if (v instanceof Data_Ordering.GT) {
+                  return y;
+              };
+              throw new Error("Failed pattern match at Data.Ord (line 158, column 3 - line 161, column 12): " + [ v.constructor.name ]);
+          };
+      };
+  };
   exports["compare"] = compare;
+  exports["min"] = min;
   exports["max"] = max;
   exports["ordInt"] = ordInt;
   exports["ordString"] = ordString;
@@ -6149,6 +6236,7 @@ var PS = {};
   exports["fromNumber"] = fromNumber;
   exports["round"] = round;
   exports["fromString"] = fromString;
+  exports["toNumber"] = $foreign.toNumber;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.13.8
@@ -6347,8 +6435,14 @@ var PS = {};
   "use strict";
   $PS["Constants"] = $PS["Constants"] || {};
   var exports = $PS["Constants"];
+  var secondsInADay = 86400;
+  var maxBox = 64;
   var firstBox = 1;
+  var factorForNextBox = 2;
   exports["firstBox"] = firstBox;
+  exports["factorForNextBox"] = factorForNextBox;
+  exports["maxBox"] = maxBox;
+  exports["secondsInADay"] = secondsInADay;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.13.8
@@ -9446,7 +9540,14 @@ var PS = {};
       };
       return RegexFlags;
   })();
-  exports["RegexFlags"] = RegexFlags;
+  var multiline = new RegexFlags({
+      global: false,
+      ignoreCase: false,
+      multiline: true,
+      sticky: false,
+      unicode: false
+  });
+  exports["multiline"] = multiline;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.13.8
@@ -13555,15 +13656,18 @@ var PS = {};
       return CreatingPuzzle;
   })();
   var ReviewingPuzzle = (function () {
-      function ReviewingPuzzle(value0, value1, value2) {
+      function ReviewingPuzzle(value0, value1, value2, value3) {
           this.value0 = value0;
           this.value1 = value1;
           this.value2 = value2;
+          this.value3 = value3;
       };
       ReviewingPuzzle.create = function (value0) {
           return function (value1) {
               return function (value2) {
-                  return new ReviewingPuzzle(value0, value1, value2);
+                  return function (value3) {
+                      return new ReviewingPuzzle(value0, value1, value2, value3);
+                  };
               };
           };
       };
@@ -13582,13 +13686,6 @@ var PS = {};
       };
       InvalidFEN.value = new InvalidFEN();
       return InvalidFEN;
-  })();
-  var DuplicateName = (function () {
-      function DuplicateName() {
-
-      };
-      DuplicateName.value = new DuplicateName();
-      return DuplicateName;
   })();
   var DuplicateFEN = (function () {
       function DuplicateFEN() {
@@ -13658,6 +13755,21 @@ var PS = {};
       Review.value = new Review();
       return Review;
   })();
+  var AttemptPuzzle = (function () {
+      function AttemptPuzzle(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      AttemptPuzzle.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new AttemptPuzzle(value0, value1, value2);
+              };
+          };
+      };
+      return AttemptPuzzle;
+  })();
   var UpdatePuzzleName = (function () {
       function UpdatePuzzleName(value0) {
           this.value0 = value0;
@@ -13712,7 +13824,6 @@ var PS = {};
   exports["ReviewingPuzzle"] = ReviewingPuzzle;
   exports["MissingNameOrFEN"] = MissingNameOrFEN;
   exports["InvalidFEN"] = InvalidFEN;
-  exports["DuplicateName"] = DuplicateName;
   exports["DuplicateFEN"] = DuplicateFEN;
   exports["InvalidFile"] = InvalidFile;
   exports["NoPuzzlesForReview"] = NoPuzzlesForReview;
@@ -13722,6 +13833,7 @@ var PS = {};
   exports["LoadFile"] = LoadFile;
   exports["SaveFile"] = SaveFile;
   exports["Review"] = Review;
+  exports["AttemptPuzzle"] = AttemptPuzzle;
   exports["UpdatePuzzleName"] = UpdatePuzzleName;
   exports["UpdateFEN"] = UpdateFEN;
   exports["CreatePuzzle"] = CreatePuzzle;
@@ -13736,6 +13848,7 @@ var PS = {};
   var exports = $PS["Reducer"];
   var Chess = $PS["Chess"];
   var Constants = $PS["Constants"];
+  var Control_Apply = $PS["Control.Apply"];
   var Control_Bind = $PS["Control.Bind"];
   var Data_Array = $PS["Data.Array"];
   var Data_Array_NonEmpty = $PS["Data.Array.NonEmpty"];
@@ -13752,44 +13865,57 @@ var PS = {};
   var Data_String_Common = $PS["Data.String.Common"];
   var Data_String_Regex = $PS["Data.String.Regex"];
   var Data_String_Regex_Flags = $PS["Data.String.Regex.Flags"];
+  var Data_Tuple = $PS["Data.Tuple"];
   var PuzzlesJSON = $PS["PuzzlesJSON"];
   var Types = $PS["Types"];                
+  var updatePuzzles = function (isCorrect) {
+      return function (index) {
+          return function (now) {
+              return function (varianceFactor) {
+                  return function (puzzles) {
+                      var oldBox = Data_Maybe.fromMaybe(1)(Data_Functor.map(Data_Maybe.functorMaybe)(function (p) {
+                          return p.box;
+                      })(Data_Array.index(puzzles)(index)));
+                      var newBox = (function () {
+                          if (isCorrect) {
+                              return Data_Ord.min(Data_Ord.ordInt)(Constants.maxBox)(oldBox * Constants.factorForNextBox | 0);
+                          };
+                          return Constants.firstBox;
+                      })();
+                      var newTimestamp = now - Data_Int.round(varianceFactor * Data_Int.toNumber(Constants.secondsInADay * newBox | 0)) | 0;
+                      return Data_Array.alterAt(index)(function (p) {
+                          return new Data_Maybe.Just({
+                              box: newBox,
+                              lastDrilledAt: newTimestamp,
+                              fen: p.fen,
+                              move: p.move,
+                              name: p.name
+                          });
+                      })(puzzles);
+                  };
+              };
+          };
+      };
+  };
   var incrementName = function (puzzles) {
       return function (name) {
-          var flags = new Data_String_Regex_Flags.RegexFlags({
-              global: false,
-              ignoreCase: false,
-              multiline: true,
-              sticky: false,
-              unicode: false
-          });
-          var nameRegex = Data_Either.fromRight()(Data_String_Regex.regex("^(\\S.*\\S)\\s+\\?$")(flags));
-          var nameMatch = Data_String_Regex.match(nameRegex)(name);
-          var puzzlesRegex = Data_Either.fromRight()(Data_String_Regex.regex("^(\\S.*\\S)\\s+([1-9][0-9]*)$")(flags));
-          var puzzleMatches = Data_Array.mapMaybe(function (nonEmptyArr) {
+          var $25 = Data_Maybe.isNothing(Data_Array.findIndex(function (p) {
+              return p.name === name;
+          })(puzzles));
+          if ($25) {
+              return name;
+          };
+          var previousIncrementsRegex = Data_Either.fromRight()(Data_String_Regex.regex("^(\\S.*\\S)\\s+#([1-9][0-9]*)$")(Data_String_Regex_Flags.multiline));
+          var currentIncrement = 1 + Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Ord.max(Data_Ord.ordInt))(1)(Data_Array.mapMaybe(function (nonEmptyArr) {
               var v = Data_Array_NonEmpty.toArray(nonEmptyArr);
               if (v.length === 3 && (v[0] instanceof Data_Maybe.Just && (v[1] instanceof Data_Maybe.Just && v[2] instanceof Data_Maybe.Just))) {
-                  return Data_Functor.map(Data_Maybe.functorMaybe)(function (parsedInt) {
-                      return {
-                          name: v[1].value0,
-                          "int": parsedInt
-                      };
-                  })(Data_Int.fromString(v[2].value0));
+                  return Data_Int.fromString(v[2].value0);
               };
               return Data_Maybe.Nothing.value;
-          })(Data_Array.mapMaybe(Data_String_Regex.match(puzzlesRegex))(Data_Functor.map(Data_Functor.functorArray)(function (p) {
+          })(Data_Array.mapMaybe(Data_String_Regex.match(previousIncrementsRegex))(Data_Functor.map(Data_Functor.functorArray)(function (p) {
               return p.name;
-          })(puzzles)));
-          var v = Data_Functor.map(Data_Maybe.functorMaybe)(Data_Array_NonEmpty.toArray)(nameMatch);
-          if (v instanceof Data_Maybe.Just && (v.value0.length === 2 && (v["value0"][0] instanceof Data_Maybe.Just && v["value0"][1] instanceof Data_Maybe.Just))) {
-              var currentIncrement = Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Ord.max(Data_Ord.ordInt))(0)(Data_Functor.map(Data_Functor.functorArray)(function (m) {
-                  return m["int"];
-              })(Data_Array.filter(function (match) {
-                  return match.name === v["value0"][1].value0;
-              })(puzzleMatches)));
-              return v["value0"][1].value0 + (" " + Data_Show.show(Data_Show.showInt)(1 + currentIncrement | 0));
-          };
-          return name;
+          })(puzzles)))) | 0;
+          return name + (" #" + Data_Show.show(Data_Show.showInt)(currentIncrement));
       };
   };
   var getPuzzleByName = function (puzzles) {
@@ -13820,11 +13946,11 @@ var PS = {};
   };
   var reducer = function (state) {
       return function (action) {
-          var $35 = {
+          var $33 = {
               act: action,
               vw: state.view
           };
-          if ($35.act instanceof Types.NewFile) {
+          if ($33.act instanceof Types.NewFile) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
@@ -13832,28 +13958,28 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.UpdatePuzzleName && $35.vw instanceof Types.MainMenu) {
+          if ($33.act instanceof Types.UpdatePuzzleName && $33.vw instanceof Types.MainMenu) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
-                  view: new Types.MainMenu($35.act.value0, $35.vw.value1),
+                  view: new Types.MainMenu($33.act.value0, $33.vw.value1),
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.UpdateFEN && $35.vw instanceof Types.MainMenu) {
+          if ($33.act instanceof Types.UpdateFEN && $33.vw instanceof Types.MainMenu) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
-                  view: new Types.MainMenu($35.vw.value0, $35.act.value0),
+                  view: new Types.MainMenu($33.vw.value0, $33.act.value0),
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.CreatePuzzle && $35.vw instanceof Types.MainMenu) {
-              var trimmedName = Data_String_Common.trim($35.vw.value0);
-              var trimmedFEN = Data_String_Common.trim($35.vw.value1);
+          if ($33.act instanceof Types.CreatePuzzle && $33.vw instanceof Types.MainMenu) {
+              var trimmedName = Data_String_Common.trim($33.vw.value0);
+              var trimmedFEN = Data_String_Common.trim($33.vw.value1);
               var sanitizedFEN = Chess.sanitizeFEN(trimmedFEN);
-              var $48 = Data_String_CodePoints.length(trimmedName) === 0 || Data_String_CodePoints.length(trimmedFEN) === 0;
-              if ($48) {
+              var $46 = Data_String_CodePoints.length(trimmedName) === 0 || Data_String_CodePoints.length(trimmedFEN) === 0;
+              if ($46) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -13861,8 +13987,8 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.MissingNameOrFEN.value)
                   };
               };
-              var $49 = !Chess.fenIsValid($35.vw.value1);
-              if ($49) {
+              var $47 = !Chess.fenIsValid($33.vw.value1);
+              if ($47) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -13870,21 +13996,10 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.InvalidFEN.value)
                   };
               };
-              var $50 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(trimmedName)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
-                  return p.name;
-              })(state.puzzles)));
-              if ($50) {
-                  return {
-                      puzzles: state.puzzles,
-                      reviewStack: state.reviewStack,
-                      view: state.view,
-                      alert: new Data_Maybe.Just(Types.DuplicateName.value)
-                  };
-              };
-              var $51 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(sanitizedFEN)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
+              var $48 = Data_Maybe.isJust(Data_Array.elemIndex(Data_Eq.eqString)(sanitizedFEN)(Data_Functor.map(Data_Functor.functorArray)(function (p) {
                   return p.fen;
               })(state.puzzles)));
-              if ($51) {
+              if ($48) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
@@ -13899,7 +14014,7 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.BackToMain) {
+          if ($33.act instanceof Types.BackToMain) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
@@ -13907,19 +14022,19 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.AddMoveToNewPuzzle && $35.vw instanceof Types.CreatingPuzzle) {
+          if ($33.act instanceof Types.AddMoveToNewPuzzle && $33.vw instanceof Types.CreatingPuzzle) {
               return {
                   puzzles: state.puzzles,
                   reviewStack: state.reviewStack,
-                  view: new Types.CreatingPuzzle($35.vw.value0, $35.vw.value1, new Data_Maybe.Just($35.act.value0)),
+                  view: new Types.CreatingPuzzle($33.vw.value0, $33.vw.value1, new Data_Maybe.Just($33.act.value0)),
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.SavePuzzle && ($35.vw instanceof Types.CreatingPuzzle && $35.vw.value2 instanceof Data_Maybe.Just)) {
+          if ($33.act instanceof Types.SavePuzzle && ($33.vw instanceof Types.CreatingPuzzle && $33.vw.value2 instanceof Data_Maybe.Just)) {
               var newPuzzle = {
-                  name: $35.vw.value0,
-                  fen: $35.vw.value1,
-                  move: $35.vw.value2.value0,
+                  name: $33.vw.value0,
+                  fen: $33.vw.value1,
+                  move: $33.vw.value2.value0,
                   box: Constants.firstBox,
                   lastDrilledAt: 0
               };
@@ -13935,12 +14050,12 @@ var PS = {};
                   alert: state.alert
               };
           };
-          if ($35.act instanceof Types.LoadFile && $35.vw instanceof Types.LoadingFile) {
-              var v = PuzzlesJSON.parsePuzzlesJSON($35.act.value0);
+          if ($33.act instanceof Types.LoadFile && $33.vw instanceof Types.LoadingFile) {
+              var v = PuzzlesJSON.parsePuzzlesJSON($33.act.value0);
               if (v instanceof Data_Maybe.Just) {
                   return {
                       puzzles: v.value0,
-                      reviewStack: generateReviewStack($35.act.value1)(v.value0),
+                      reviewStack: generateReviewStack($33.act.value1)(v.value0),
                       view: new Types.MainMenu("", ""),
                       alert: state.alert
                   };
@@ -13953,15 +14068,15 @@ var PS = {};
                       alert: new Data_Maybe.Just(Types.InvalidFile.value)
                   };
               };
-              throw new Error("Failed pattern match at Reducer (line 72, column 7 - line 79, column 45): " + [ v.constructor.name ]);
+              throw new Error("Failed pattern match at Reducer (line 66, column 7 - line 73, column 45): " + [ v.constructor.name ]);
           };
-          if ($35.act instanceof Types.Review) {
+          if ($33.act instanceof Types.Review) {
               var v = Control_Bind.bind(Data_Maybe.bindMaybe)(Data_Array.head(state.reviewStack))(getPuzzleByName(state.puzzles));
               if (v instanceof Data_Maybe.Just) {
                   return {
                       puzzles: state.puzzles,
                       reviewStack: state.reviewStack,
-                      view: new Types.ReviewingPuzzle(v.value0.name, v.value0.fen, Data_Maybe.Nothing.value),
+                      view: new Types.ReviewingPuzzle(v.value0.name, v.value0.fen, Data_Maybe.Nothing.value, true),
                       alert: state.alert
                   };
               };
@@ -13984,7 +14099,52 @@ var PS = {};
                   };
                   return state;
               };
-              throw new Error("Failed pattern match at Reducer (line 81, column 7 - line 91, column 20): " + [ v.constructor.name ]);
+              throw new Error("Failed pattern match at Reducer (line 75, column 7 - line 85, column 20): " + [ v.constructor.name ]);
+          };
+          if ($33.act instanceof Types.AttemptPuzzle && ($33.vw instanceof Types.ReviewingPuzzle && ($33.vw.value2 instanceof Data_Maybe.Nothing && $33.vw.value3))) {
+              var updateStateView = function (s) {
+                  return {
+                      view: new Types.ReviewingPuzzle($33.vw.value0, $33.vw.value1, new Data_Maybe.Just($33.act.value0), false),
+                      alert: s.alert,
+                      puzzles: s.puzzles,
+                      reviewStack: s.reviewStack
+                  };
+              };
+              var updateStateReviewStack = function (s) {
+                  return {
+                      reviewStack: Data_Maybe.fromMaybe([  ])(Data_Array.tail(s.reviewStack)),
+                      alert: s.alert,
+                      puzzles: s.puzzles,
+                      view: s.view
+                  };
+              };
+              var indexInPuzzles = Data_Array.findIndex(function (p) {
+                  return p.name === $33.vw.value0;
+              })(state.puzzles);
+              var isCorrect = Data_Functor.map(Data_Maybe.functorMaybe)(function (p) {
+                  return p.move === $33.act.value0;
+              })(Control_Bind.bind(Data_Maybe.bindMaybe)(indexInPuzzles)(function (i) {
+                  return Data_Array.index(state.puzzles)(i);
+              }));
+              var updateStatePuzzles = function (s) {
+                  return {
+                      puzzles: Data_Maybe.fromMaybe(s.puzzles)(Control_Bind.bind(Data_Maybe.bindMaybe)(Control_Apply.lift2(Data_Maybe.applyMaybe)(Data_Tuple.Tuple.create)(isCorrect)(indexInPuzzles))(function (tup) {
+                          return updatePuzzles(Data_Tuple.fst(tup))(Data_Tuple.snd(tup))($33.act.value1)($33.act.value2)(s.puzzles);
+                      })),
+                      alert: s.alert,
+                      reviewStack: s.reviewStack,
+                      view: s.view
+                  };
+              };
+              return updateStatePuzzles(updateStateReviewStack(updateStateView(state)));
+          };
+          if ($33.act instanceof Types.AttemptPuzzle && ($33.vw instanceof Types.ReviewingPuzzle && ($33.vw.value2 instanceof Data_Maybe.Nothing && !$33.vw.value3))) {
+              return {
+                  puzzles: state.puzzles,
+                  reviewStack: state.reviewStack,
+                  view: new Types.ReviewingPuzzle($33.vw.value0, $33.vw.value1, new Data_Maybe.Just($33.act.value0), false),
+                  alert: state.alert
+              };
           };
           return state;
       };
@@ -14042,8 +14202,8 @@ var PS = {};
       })();
       var chessboardDiv = (function () {
           var noDisplayClassArray = (function () {
-              var $18 = boardIsVisible(state);
-              if ($18) {
+              var $20 = boardIsVisible(state);
+              if ($20) {
                   return [  ];
               };
               return [ Halogen_HTML_Properties.class_("noDisplay") ];
@@ -14059,9 +14219,6 @@ var PS = {};
       if (v instanceof Types.InvalidFEN) {
           return "Invalid FEN";
       };
-      if (v instanceof Types.DuplicateName) {
-          return "A puzzle with this name already exists";
-      };
       if (v instanceof Types.DuplicateFEN) {
           return "A puzzle with this FEN already exists";
       };
@@ -14074,7 +14231,7 @@ var PS = {};
       if (v instanceof Types.AllPuzzlesReviewed) {
           return "You completed all the puzzles that are up for review";
       };
-      throw new Error("Failed pattern match at Render (line 76, column 13 - line 83, column 79): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Render (line 76, column 13 - line 82, column 79): " + [ v.constructor.name ]);
   };
   exports["render"] = render;
   exports["alertText"] = alertText;
@@ -14139,14 +14296,14 @@ var PS = {};
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Web_HTML.window))(function (w) {
                               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Web_HTML_Window.alert(Render.alertText(stateAfterAction.alert.value0))(w)))(function () {
                                   return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (stateWithAlert) {
-                                      var $13 = {};
-                                      for (var $14 in stateWithAlert) {
-                                          if ({}.hasOwnProperty.call(stateWithAlert, $14)) {
-                                              $13[$14] = stateWithAlert[$14];
+                                      var $14 = {};
+                                      for (var $15 in stateWithAlert) {
+                                          if ({}.hasOwnProperty.call(stateWithAlert, $15)) {
+                                              $14[$15] = stateWithAlert[$15];
                                           };
                                       };
-                                      $13.alert = Data_Maybe.Nothing.value;
-                                      return $13;
+                                      $14.alert = Data_Maybe.Nothing.value;
+                                      return $14;
                                   });
                               });
                           });

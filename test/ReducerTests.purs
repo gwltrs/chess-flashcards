@@ -505,3 +505,41 @@ reducerTests = suite "Reducer" do
         }
         (AttemptPuzzle ohcMove 2_000_000_000 0.1)
       )
+
+  test "User retries a puzzle" do
+
+    -- Should simply replace the Just move with Nothing
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
+        reviewStack: ["Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
+          reviewStack: ["Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") false, 
+          alert: Nothing
+        }
+        Retry
+      )
+
+    Assert.equal 
+      { 
+        puzzles: [endgamePuzzle1 { box = 4, lastDrilledAt = 999_913_600 }, endgamePuzzle2], 
+        reviewStack: [endgamePuzzle2.name], 
+        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing false, 
+        alert: Nothing
+      }
+      (reducer 
+        { 
+          puzzles: [endgamePuzzle1 { box = 4, lastDrilledAt = 999_913_600 }, endgamePuzzle2], 
+          reviewStack: [endgamePuzzle2.name], 
+          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just endgamePuzzle1.move) false, 
+          alert: Nothing
+        }
+        Retry
+      )
