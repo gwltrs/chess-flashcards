@@ -2,7 +2,7 @@ module Reducer where
 
 import Prelude ((-), (>), compare, (>>=), (*))
 import Control.Apply (lift2)
-import Data.Maybe (Maybe(..), isJust, fromMaybe)
+import Data.Maybe (Maybe(..), isJust, fromMaybe, isNothing)
 import Data.HeytingAlgebra ((||), not)
 import Data.String (trim, length)
 import Data.Eq ((==))
@@ -11,7 +11,7 @@ import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor (map)
 import Data.String.Regex (regex, match)
-import Data.String.Regex.Flags (RegexFlags(..))
+import Data.String.Regex.Flags (multiline)
 import Data.Either (fromRight)
 import Partial.Unsafe (unsafePartial)
 import Data.Int (fromString, toNumber, round)
@@ -113,40 +113,58 @@ reducer state action =
     { act: _, vw: _ } ->
       state
 
--- Assumes the name is already trimmed at this point
 -- Auto-incrementing the name removes the hassle of duplicate names
 -- "endgame" -> "endgame" if no puzzles already exist
 -- "endgame" -> "endgame #2" if one puzzle already exists with the names "endgame"
 -- "endgame" -> "endgame #3" if two puzzles already exist with the names "endgame" and "endgame #2"
+-- Behavior is undefined for untrimmed names
 incrementName :: Array Puzzle -> String -> String
 incrementName puzzles name = 
-  let 
-    flags = RegexFlags { global: false, ignoreCase: false, multiline: true, sticky: false, unicode: false }
-    nameRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+\\?$" flags))
-    nameMatch = match nameRegex name
-    puzzlesRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+([1-9][0-9]*)$" flags))
-    puzzleMatches = 
-      puzzles 
+  if isNothing (findIndex (\p -> p.name == name) puzzles) then
+    name
+  else
+    let
+      previousIncrementsRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" multiline))
+      currentIncrement = puzzles
         # (map \p -> p.name) 
-        # (mapMaybe (match puzzlesRegex))
+        # (mapMaybe (match previousIncrementsRegex))
         # (mapMaybe \nonEmptyArr -> 
             case toArray nonEmptyArr of
-              [Just _, Just nameString, Just intString] ->
-                fromString intString # (map \parsedInt -> { name: nameString, int: parsedInt })
-              _ -> 
-                Nothing
-          )
-  in
-    case nameMatch # map toArray of
-      Just [Just _, Just nameWithQuestionMark] -> 
-        nameWithQuestionMark <> " " <> (currentIncrement # add 1 # show)
-          where
-            currentIncrement = puzzleMatches
-              # (filter \match -> match.name == nameWithQuestionMark)
-              # (map \m -> m.int)
-              # (foldr max 0)
-      _ -> 
-        name
+              [Just _, Just _, Just intString] -> fromString intString
+              _ -> Nothing)
+        # (foldr max 1)
+        # add 1
+    in
+      name <> " #" <> show currentIncrement
+
+
+  -- let 
+  --   flags = RegexFlags { global: false, ignoreCase: false, multiline: true, sticky: false, unicode: false }
+  --   nameRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+\\?$" flags))
+  --   nameMatch = match nameRegex name
+  --   puzzlesRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" flags))
+  --   puzzleMatches = 
+  --     puzzles 
+  --       # (map \p -> p.name) 
+  --       # (mapMaybe (match puzzlesRegex))
+  --       # (mapMaybe \nonEmptyArr -> 
+  --           case toArray nonEmptyArr of
+  --             [Just _, Just nameString, Just intString] ->
+  --               fromString intString # (map \parsedInt -> { name: nameString, int: parsedInt })
+  --             _ -> 
+  --               Nothing
+  --         )
+  -- in
+  --   case nameMatch # map toArray of
+  --     Just [Just _, Just nameWithQuestionMark] -> 
+  --       nameWithQuestionMark <> " " <> (currentIncrement # add 1 # show)
+  --         where
+  --           currentIncrement = puzzleMatches
+  --             # (filter \match -> match.name == nameWithQuestionMark)
+  --             # (map \m -> m.int)
+  --             # (foldr max 0)
+  --     _ -> 
+  --       name
 
 -- Decides which puzzles are "up for review" by looking at the last-drilled-at date and what "box" they are in.
 -- "box" refers to the flashcards-in-boxes spaced repetition system which this app gets inspiration from.
