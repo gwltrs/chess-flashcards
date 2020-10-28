@@ -135,35 +135,6 @@ incrementName puzzles name =
     in
       name <> " #" <> show currentIncrement
 
-
-  -- let 
-  --   flags = RegexFlags { global: false, ignoreCase: false, multiline: true, sticky: false, unicode: false }
-  --   nameRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+\\?$" flags))
-  --   nameMatch = match nameRegex name
-  --   puzzlesRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" flags))
-  --   puzzleMatches = 
-  --     puzzles 
-  --       # (map \p -> p.name) 
-  --       # (mapMaybe (match puzzlesRegex))
-  --       # (mapMaybe \nonEmptyArr -> 
-  --           case toArray nonEmptyArr of
-  --             [Just _, Just nameString, Just intString] ->
-  --               fromString intString # (map \parsedInt -> { name: nameString, int: parsedInt })
-  --             _ -> 
-  --               Nothing
-  --         )
-  -- in
-  --   case nameMatch # map toArray of
-  --     Just [Just _, Just nameWithQuestionMark] -> 
-  --       nameWithQuestionMark <> " " <> (currentIncrement # add 1 # show)
-  --         where
-  --           currentIncrement = puzzleMatches
-  --             # (filter \match -> match.name == nameWithQuestionMark)
-  --             # (map \m -> m.int)
-  --             # (foldr max 0)
-  --     _ -> 
-  --       name
-
 -- Decides which puzzles are "up for review" by looking at the last-drilled-at date and what "box" they are in.
 -- "box" refers to the flashcards-in-boxes spaced repetition system which this app gets inspiration from.
 -- https://en.wikipedia.org/wiki/Leitner_system 
