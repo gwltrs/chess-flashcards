@@ -108,6 +108,8 @@ reducer state action =
       vw: ReviewingPuzzle puzzleName fen Nothing false
     } ->
       state { view = ReviewingPuzzle puzzleName fen (Just move) false }
+    { act: Retry, vw: ReviewingPuzzle puzzleName fen (Just move) false } ->
+      state { view = ReviewingPuzzle puzzleName fen Nothing false }
     { act: _, vw: _ } ->
       state
 
