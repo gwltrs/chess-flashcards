@@ -13,3 +13,6 @@ maxBox = 64
 
 secondsInADay :: TimestampSeconds
 secondsInADay = 86_400
+
+maxVariance :: Number
+maxVariance = 0.1
