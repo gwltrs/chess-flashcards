@@ -76,7 +76,6 @@ alertText :: Alert -> String
 alertText = case _ of
   MissingNameOrFEN -> "Empty field(s): provide a name and FEN for the new puzzle"
   InvalidFEN -> "Invalid FEN"
-  DuplicateName -> "A puzzle with this name already exists"
   DuplicateFEN -> "A puzzle with this FEN already exists"
   InvalidFile -> "The selected file doesn't have the expected format"
   NoPuzzlesForReview -> "No puzzles are up for review at this time"

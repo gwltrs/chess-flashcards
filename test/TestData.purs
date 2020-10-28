@@ -33,7 +33,7 @@ najdorfFENWithValidEnPassant = "r2q1rk1/3nb1pp/p2p4/1p1PppPn/8/1N2BP2/PPPQ3P/2KR
 endgamePuzzle1 :: Puzzle
 endgamePuzzle1 = 
   { 
-    name: "endgame 1",
+    name: "endgame",
     fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
     move: "d7d8k",
     box: 2,
@@ -43,7 +43,7 @@ endgamePuzzle1 =
 endgamePuzzle2 :: Puzzle
 endgamePuzzle2 = 
   { 
-    name: "endgame 2",
+    name: "endgame #2",
     fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
     move: "g6g7",
     box: 4,
@@ -77,14 +77,14 @@ twoEndgamePuzzlesJSON :: String
 twoEndgamePuzzlesJSON = """
   [
     { 
-      name: "endgame 1",
+      name: "endgame",
       fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
       move: "d7d8k",
       box: 2,
       lastDrilledAt: 1601324525
     },
     { 
-      name: "endgame 2",
+      name: "endgame #2",
       fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
       move: "g6g7",
       box: 4,

@@ -120,22 +120,6 @@ reducerTests = suite "Reducer" do
         CreatePuzzle
       ) 
 
-  test "User tries to create puzzle with duplicate name" do
-
-    Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Just DuplicateName }
-      (reducer 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" ohcFENWithMoveNumbers, alert: Nothing }
-        CreatePuzzle
-      ) 
-
-    Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Just DuplicateName }
-      (reducer 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " endgame 2 " ohcFENWithMoveNumbers, alert: Nothing } -- Making sure the check happens after the name is trimmed
-        CreatePuzzle
-      ) 
-
   test "User tries to create puzzle with duplicate fen" do
 
     -- Check should happen after FEN is trimmed and sanitized (move numbers and unnecessary en passant removed)
@@ -161,26 +145,15 @@ reducerTests = suite "Reducer" do
         CreatePuzzle
       )
 
-  test "User tries to create puzzle with duplicate name and FEN" do
-
-    -- Duplicate name check should happen before duplicate FEN check
-
-    Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Just DuplicateName }
-      (reducer 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame 1" endgamePuzzle1.fen, alert: Nothing }
-        CreatePuzzle
-      ) 
-
   test "User navigates to create-puzzle view" do
 
     -- Both the puzzle name and FEN should be trimmed
     -- Move numbers from FEN should be stripped
     -- Unnecessary en passant info in FEN should be replaced with "-"
-    -- Puzzle name "incrementing" feature
-    --   This allows the user to name the puzzle with a description and an auto-increment number without having to remember the previous number
-    --   "checkmate pattern ?" -> "checkmate pattern 1" if no puzzles already exist
-    --   "endgame ?" -> "endgame 3" if two puzzles already exist with the names "endgame 1" and "endgame 2"
+    -- Puzzle name "auto-increment" feature
+    --   This allows the user to name the puzzle without having to worry about conflicting names
+    --   "checkmate pattern" -> "checkmate pattern" if no puzzles already exist
+    --   "endgame" -> "endgame #3" if two puzzles already exist with the names "endgame" and "endgame #2"
 
     Assert.equal
       { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "OHC" ohcFEN Nothing, alert: Nothing }
@@ -211,16 +184,16 @@ reducerTests = suite "Reducer" do
       ) 
 
     Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "checkmate pattern 1" ohcFEN Nothing, alert: Nothing }
+      { puzzles: [openGamePuzzle], reviewStack: [], view: CreatingPuzzle "Open Game #2" ohcFEN Nothing, alert: Nothing }
       (reducer 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu " checkmate pattern ? " ohcFENWithMoveNumbers, alert: Nothing }
+        { puzzles: [openGamePuzzle], reviewStack: [], view: MainMenu "   Open Game " ohcFEN, alert: Nothing }
         CreatePuzzle
-      ) 
+      )
 
     Assert.equal 
-      { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame 3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
+      { puzzles: twoEndgamePuzzles, reviewStack: [], view: CreatingPuzzle "endgame #3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
       (reducer 
-        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame ?" najdorfFENWithValidEnPassant, alert: Nothing }
+        { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame" najdorfFENWithValidEnPassant, alert: Nothing }
         CreatePuzzle
       ) 
 

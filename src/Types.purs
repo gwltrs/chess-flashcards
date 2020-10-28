@@ -64,7 +64,6 @@ instance showView :: Show View where
 data Alert = 
   MissingNameOrFEN |
   InvalidFEN | 
-  DuplicateName |
   DuplicateFEN |
   InvalidFile |
   NoPuzzlesForReview |
@@ -76,7 +75,6 @@ instance showAlert :: Show Alert where
   show alert = case alert of
     MissingNameOrFEN -> "MissingNameOrFEN"
     InvalidFEN -> "InvalidFEN"
-    DuplicateName -> "DuplicateName"
     DuplicateFEN -> "DuplicateFEN"
     InvalidFile -> "InvalidFile"
     NoPuzzlesForReview -> "NoPuzzlesForReview"
