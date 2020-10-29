@@ -28,6 +28,7 @@ import Chess (getMove)
 import File (saveFile, openFileDialog)
 import PuzzlesJSON (makePuzzlesJSON)
 import Constants (maxVariance)
+import Clipboard (copyToClipboard)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -87,6 +88,8 @@ handleAction action = do
       textInFile <- H.liftAff openFileDialog
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (LoadFile textInFile nowTimestamp)
+    CopyFEN -> do
+      H.liftEffect (copyToClipboard (boardFEN stateAfterAction))
     _ ->
       pure unit
 
