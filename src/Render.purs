@@ -1,6 +1,6 @@
 module Render where
 
-import Prelude (not)
+import Prelude (not, (>>>))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -31,8 +31,8 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
               HH.br_,
               menuButton "Review" Review true,
               HH.br_,
-              HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdatePuzzleName val) ],
-              HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdateFEN val) ],
+              menuInput "Name" UpdatePuzzleName,
+              menuInput "FEN" UpdateFEN,
               menuButton "Create" CreatePuzzle true
             ]
         CreatingPuzzle puzzleName _ move ->
@@ -77,6 +77,15 @@ menuButton text action isEnabled =
     ] 
     [ 
       HH.text text
+    ]
+
+menuInput :: forall w i. String -> (String -> w) -> HC.HTML i w
+menuInput placeholder actionMaker =
+  HH.input
+    [
+      HP.placeholder placeholder,
+      HP.class_ (HC.ClassName "textField"), 
+      HE.onValueChange (actionMaker >>> Just)
     ]
 
 alertText :: Alert -> String
