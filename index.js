@@ -14350,6 +14350,7 @@ var PS = {};
   var Data_Maybe = $PS["Data.Maybe"];
   var Data_Newtype = $PS["Data.Newtype"];
   var Data_Time_Duration = $PS["Data.Time.Duration"];
+  var Data_Tuple = $PS["Data.Tuple"];
   var Data_Unit = $PS["Data.Unit"];
   var Effect = $PS["Effect"];
   var Effect_Aff = $PS["Effect.Aff"];
@@ -14389,15 +14390,6 @@ var PS = {};
       };
       return "";
   };
-  var boardFEN = function (state) {
-      if (state.view instanceof Types.CreatingPuzzle) {
-          return state.view.value1;
-      };
-      if (state.view instanceof Types.ReviewingPuzzle) {
-          return state.view.value1;
-      };
-      return "";
-  };
   var handleAction = function (dictMonadAff) {
       return function (action) {
           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (state) {
@@ -14409,14 +14401,14 @@ var PS = {};
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Web_HTML.window))(function (w) {
                               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Web_HTML_Window.alert(Render.alertText(stateAfterAction.alert.value0))(w)))(function () {
                                   return Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(function (stateWithAlert) {
-                                      var $19 = {};
-                                      for (var $20 in stateWithAlert) {
-                                          if ({}.hasOwnProperty.call(stateWithAlert, $20)) {
-                                              $19[$20] = stateWithAlert[$20];
+                                      var $12 = {};
+                                      for (var $13 in stateWithAlert) {
+                                          if ({}.hasOwnProperty.call(stateWithAlert, $13)) {
+                                              $12[$13] = stateWithAlert[$13];
                                           };
                                       };
-                                      $19.alert = Data_Maybe.Nothing.value;
-                                      return $19;
+                                      $12.alert = Data_Maybe.Nothing.value;
+                                      return $12;
                                   });
                               });
                           });
@@ -14424,17 +14416,18 @@ var PS = {};
                       if (stateAfterAction.alert instanceof Data_Maybe.Nothing) {
                           return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
                       };
-                      throw new Error("Failed pattern match at Main (line 60, column 3 - line 66, column 16): " + [ stateAfterAction.alert.constructor.name ]);
+                      throw new Error("Failed pattern match at Main (line 61, column 3 - line 67, column 16): " + [ stateAfterAction.alert.constructor.name ]);
                   })())(function () {
-                      if (action instanceof Types.CreatePuzzle) {
-                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(stateAfterAction))("")))(function (move) {
+                      var v = new Data_Tuple.Tuple(action, stateAfterAction.view);
+                      if (v.value0 instanceof Types.CreatePuzzle && (v.value1 instanceof Types.CreatingPuzzle && v.value1.value2 instanceof Data_Maybe.Nothing)) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(v.value1.value1)("")))(function (move) {
                               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(nowInSeconds))(function (nowTimestamp) {
                                   return handleAction(dictMonadAff)(new Types.AddMoveToNewPuzzle(move));
                               });
                           });
                       };
-                      if (action instanceof Types.Review) {
-                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(stateAfterAction))(expectedMove(stateAfterAction))))(function (move) {
+                      if (v.value0 instanceof Types.Review && (v.value1 instanceof Types.ReviewingPuzzle && v.value1.value2 instanceof Data_Maybe.Nothing)) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(v.value1.value1)(expectedMove(stateAfterAction))))(function (move) {
                               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Effect_Random.random))(function (random0To1) {
                                   return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(nowInSeconds))(function (nowTimestamp) {
                                       return handleAction(dictMonadAff)(new Types.AttemptPuzzle(move, nowTimestamp, Constants.maxVariance * random0To1));
@@ -14442,8 +14435,8 @@ var PS = {};
                               });
                           });
                       };
-                      if (action instanceof Types.Retry) {
-                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(boardFEN(stateAfterAction))(expectedMove(stateAfterAction))))(function (move) {
+                      if (v.value0 instanceof Types.Retry && (v.value1 instanceof Types.ReviewingPuzzle && v.value1.value2 instanceof Data_Maybe.Nothing)) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(Chess.getMove(v.value1.value1)(expectedMove(stateAfterAction))))(function (move) {
                               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Effect_Random.random))(function (random0To1) {
                                   return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(nowInSeconds))(function (nowTimestamp) {
                                       return handleAction(dictMonadAff)(new Types.AttemptPuzzle(move, nowTimestamp, Constants.maxVariance * random0To1));
@@ -14451,20 +14444,20 @@ var PS = {};
                               });
                           });
                       };
-                      if (action instanceof Types.SaveFile) {
+                      if (v.value0 instanceof Types.SaveFile) {
                           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(File.saveFile("chess-flashcards-data.txt")(PuzzlesJSON.makePuzzlesJSON(stateAfterAction.puzzles))))(function () {
                               return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
                           });
                       };
-                      if (action instanceof Types.OpenFileDialog) {
+                      if (v.value0 instanceof Types.OpenFileDialog) {
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(dictMonadAff))(File.openFileDialog))(function (textInFile) {
                               return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(nowInSeconds))(function (nowTimestamp) {
                                   return handleAction(dictMonadAff)(new Types.LoadFile(textInFile, nowTimestamp));
                               });
                           });
                       };
-                      if (action instanceof Types.CopyFEN) {
-                          return Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Clipboard.copyToClipboard(boardFEN(stateAfterAction)));
+                      if (v.value0 instanceof Types.CopyFEN && v.value1 instanceof Types.ReviewingPuzzle) {
+                          return Effect_Class.liftEffect(Halogen_Query_HalogenM.monadEffectHalogenM(dictMonadAff.MonadEffect0()))(Clipboard.copyToClipboard(v.value1.value1));
                       };
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
                   });
@@ -14492,7 +14485,6 @@ var PS = {};
   exports["component"] = component;
   exports["initialState"] = initialState;
   exports["handleAction"] = handleAction;
-  exports["boardFEN"] = boardFEN;
   exports["expectedMove"] = expectedMove;
   exports["nowInSeconds"] = nowInSeconds;
 })(PS);

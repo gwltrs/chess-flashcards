@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude (Unit, bind, unit, discard, (/), (==), (*))
+import Prelude (Unit, bind, discard, unit, (*), (/), (==))
 
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Function ((#))
@@ -20,6 +20,7 @@ import Data.Newtype (unwrap)
 import Data.Int (round)
 import Data.Foldable (find)
 import Effect.Random (random)
+import Data.Tuple (Tuple(..))
 
 import Types
 import Reducer (reducer)
@@ -66,39 +67,32 @@ handleAction action = do
       pure unit
 
   -- Firing off the rest of the Effects and Affs
-  case action of
-    CreatePuzzle -> do
-      move <- H.liftAff (getMove (boardFEN stateAfterAction) "")
+  case Tuple action stateAfterAction.view of
+    Tuple CreatePuzzle (CreatingPuzzle _ fen Nothing) -> do
+      move <- H.liftAff (getMove fen "")
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (AddMoveToNewPuzzle move)
-    Review -> do
-      move <- H.liftAff (getMove (boardFEN stateAfterAction) (expectedMove stateAfterAction))
+    Tuple Review (ReviewingPuzzle _ fen Nothing _) -> do
+      move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
-    Retry -> do
-      move <- H.liftAff (getMove (boardFEN stateAfterAction) (expectedMove stateAfterAction))
+    Tuple Retry (ReviewingPuzzle _ fen Nothing _) -> do
+      move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
-    SaveFile -> do
+    Tuple SaveFile _ -> do
       H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON stateAfterAction.puzzles))
       pure unit
-    OpenFileDialog -> do
+    Tuple OpenFileDialog _ -> do
       textInFile <- H.liftAff openFileDialog
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (LoadFile textInFile nowTimestamp)
-    CopyFEN -> do
-      H.liftEffect (copyToClipboard (boardFEN stateAfterAction))
+    Tuple CopyFEN (ReviewingPuzzle _ fen _ _) -> do
+      H.liftEffect (copyToClipboard fen)
     _ ->
       pure unit
-
--- TODO: Figure out how to lift Maybe into HalogenM so this function can return Maybe instead of empty string
-boardFEN :: State -> FEN
-boardFEN state = case state.view of
-  CreatingPuzzle _ fen _ -> fen
-  ReviewingPuzzle _ fen _ _ -> fen
-  _ -> ""
 
 -- TODO: Figure out how to lift Maybe into HalogenM so this function can return Maybe instead of empty string
 expectedMove :: State -> Move
