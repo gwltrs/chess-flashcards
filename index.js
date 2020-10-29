@@ -11079,6 +11079,7 @@ var PS = {};
   "use strict";
   $PS["Halogen.HTML.Properties"] = $PS["Halogen.HTML.Properties"] || {};
   var exports = $PS["Halogen.HTML.Properties"];
+  var Data_HeytingAlgebra = $PS["Data.HeytingAlgebra"];
   var Data_Maybe = $PS["Data.Maybe"];
   var Data_Newtype = $PS["Data.Newtype"];
   var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
@@ -11091,7 +11092,14 @@ var PS = {};
   };
   var value = prop(Halogen_HTML_Core.isPropString)("value");
   var name = prop(Halogen_HTML_Core.isPropString)("name"); 
-  var id_ = prop(Halogen_HTML_Core.isPropString)("id");
+  var id_ = prop(Halogen_HTML_Core.isPropString)("id");           
+  var disabled = prop(Halogen_HTML_Core.isPropBoolean)("disabled");
+  var enabled = (function () {
+      var $12 = Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraBoolean);
+      return function ($13) {
+          return disabled($12($13));
+      };
+  })();
   var class_ = (function () {
       var $18 = prop(Halogen_HTML_Core.isPropString)("className");
       var $19 = Data_Newtype.unwrap(Halogen_HTML_Core.newtypeClassName);
@@ -11106,6 +11114,7 @@ var PS = {};
   exports["name"] = name;
   exports["type_"] = type_;
   exports["value"] = value;
+  exports["enabled"] = enabled;
   exports["readOnly"] = readOnly;
 })(PS);
 (function($PS) {
@@ -14248,9 +14257,11 @@ var PS = {};
   var Types = $PS["Types"];                
   var menuButton = function (text) {
       return function (action) {
-          return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("menuButton"), Halogen_HTML_Events.onClick(function (v) {
-              return new Data_Maybe.Just(action);
-          }) ])([ Halogen_HTML_Core.text(text) ]);
+          return function (isEnabled) {
+              return Halogen_HTML_Elements.button([ Halogen_HTML_Properties.class_("menuButton"), Halogen_HTML_Events.onClick(function (v) {
+                  return new Data_Maybe.Just(action);
+              }), Halogen_HTML_Properties.enabled(isEnabled) ])([ Halogen_HTML_Core.text(text) ]);
+          };
       };
   };
   var boardIsVisible = function (state) {
@@ -14265,22 +14276,22 @@ var PS = {};
   var render = function (state) {
       var menuDiv = (function () {
           if (state.view instanceof Types.LoadingFile) {
-              return Halogen_HTML_Elements.div_([ menuButton("New")(Types.NewFile.value), menuButton("Load")(Types.OpenFileDialog.value) ]);
+              return Halogen_HTML_Elements.div_([ menuButton("New")(Types.NewFile.value)(true), menuButton("Load")(Types.OpenFileDialog.value)(true) ]);
           };
           if (state.view instanceof Types.MainMenu) {
-              return Halogen_HTML_Elements.div_([ menuButton("Save")(Types.SaveFile.value), Halogen_HTML_Elements.br_, menuButton("Review")(Types.Review.value), Halogen_HTML_Elements.br_, Halogen_HTML_Elements.input([ Halogen_HTML_Properties.class_("textField"), Halogen_HTML_Events.onValueChange(function (val) {
+              return Halogen_HTML_Elements.div_([ menuButton("Save")(Types.SaveFile.value)(true), Halogen_HTML_Elements.br_, menuButton("Review")(Types.Review.value)(true), Halogen_HTML_Elements.br_, Halogen_HTML_Elements.input([ Halogen_HTML_Properties.class_("textField"), Halogen_HTML_Events.onValueChange(function (val) {
                   return new Data_Maybe.Just(new Types.UpdatePuzzleName(val));
               }) ]), Halogen_HTML_Elements.input([ Halogen_HTML_Properties.class_("textField"), Halogen_HTML_Events.onValueChange(function (val) {
                   return new Data_Maybe.Just(new Types.UpdateFEN(val));
-              }) ]), menuButton("Create")(Types.CreatePuzzle.value) ]);
+              }) ]), menuButton("Create")(Types.CreatePuzzle.value)(true) ]);
           };
           if (state.view instanceof Types.CreatingPuzzle) {
-              return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value), Halogen_HTML_Elements.input([ Halogen_HTML_Properties.class_("label"), Halogen_HTML_Properties.value(state.view.value0), Halogen_HTML_Properties.readOnly(true) ]), menuButton("Save")(Types.SavePuzzle.value) ]);
+              return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value)(true), Halogen_HTML_Elements.input([ Halogen_HTML_Properties.class_("label"), Halogen_HTML_Properties.value(state.view.value0), Halogen_HTML_Properties.readOnly(true) ]), menuButton("Save")(Types.SavePuzzle.value)(Data_Maybe.isJust(state.view.value2)) ]);
           };
           if (state.view instanceof Types.ReviewingPuzzle) {
-              return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value), menuButton("Retry")(Types.Retry.value), menuButton("Next")(Types.Review.value), menuButton("Show Name")(Types.ShowName.value), menuButton("Copy FEN")(Types.CopyFEN.value) ]);
+              return Halogen_HTML_Elements.div_([ menuButton("Back")(Types.BackToMain.value)(true), menuButton("Retry")(Types.Retry.value)(!state.view.value3), menuButton("Next")(Types.Review.value)(!state.view.value3), menuButton("Show Name")(Types.ShowName.value)(!state.view.value3), menuButton("Copy FEN")(Types.CopyFEN.value)(!state.view.value3) ]);
           };
-          throw new Error("Failed pattern match at Render (line 19, column 7 - line 56, column 14): " + [ state.view.constructor.name ]);
+          throw new Error("Failed pattern match at Render (line 20, column 7 - line 57, column 14): " + [ state.view.constructor.name ]);
       })();
       var chessboardDiv = (function () {
           var noDisplayClassArray = (function () {
@@ -14316,7 +14327,7 @@ var PS = {};
       if (v instanceof Types.ThisIsTheName) {
           return v.value0;
       };
-      throw new Error("Failed pattern match at Render (line 81, column 13 - line 88, column 29): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Render (line 83, column 13 - line 90, column 29): " + [ v.constructor.name ]);
   };
   exports["render"] = render;
   exports["alertText"] = alertText;

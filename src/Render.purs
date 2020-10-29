@@ -1,11 +1,12 @@
 module Render where
 
+import Prelude (not)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Core as HC
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), isJust)
 import Data.Semigroup ((<>))
 
 import Types (Action(..), State, View(..), Alert(..))
@@ -20,39 +21,39 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
         LoadingFile -> 
           HH.div_
             [ 
-              menuButton "New" NewFile,
-              menuButton "Load" OpenFileDialog
+              menuButton "New" NewFile true,
+              menuButton "Load" OpenFileDialog true
             ]
         MainMenu _ _ -> 
           HH.div_
             [ 
-              menuButton "Save" SaveFile,
+              menuButton "Save" SaveFile true,
               HH.br_,
-              menuButton "Review" Review,
+              menuButton "Review" Review true,
               HH.br_,
               HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdatePuzzleName val) ],
               HH.input [ HP.class_ (HC.ClassName "textField"), HE.onValueChange \val -> Just (UpdateFEN val) ],
-              menuButton "Create" CreatePuzzle
+              menuButton "Create" CreatePuzzle true
             ]
-        CreatingPuzzle puzzleName _ _ ->
+        CreatingPuzzle puzzleName _ move ->
           HH.div_
             [ 
-              menuButton "Back" BackToMain,
+              menuButton "Back" BackToMain true,
               HH.input [
                 HP.class_ (HC.ClassName "label"),
                 HP.value puzzleName,
                 HP.readOnly true
               ],
-              menuButton "Save" SavePuzzle
+              menuButton "Save" SavePuzzle (isJust move)
             ]
-        ReviewingPuzzle _ _ _ _ ->
+        ReviewingPuzzle _ _ _ isFirst ->
           HH.div_
             [
-              menuButton "Back" BackToMain,
-              menuButton "Retry" Retry,
-              menuButton "Next" Review,
-              menuButton "Show Name" ShowName,
-              menuButton "Copy FEN" CopyFEN
+              menuButton "Back" BackToMain true,
+              menuButton "Retry" Retry (not isFirst),
+              menuButton "Next" Review (not isFirst),
+              menuButton "Show Name" ShowName (not isFirst),
+              menuButton "Copy FEN" CopyFEN (not isFirst)
             ]
 
     chessboardDiv :: H.ComponentHTML Action () m
@@ -66,12 +67,13 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
           ] <> noDisplayClassArray)
           []
 
-menuButton :: forall w i. String -> w -> HC.HTML i w
-menuButton text action = 
+menuButton :: forall w i. String -> w -> Boolean -> HC.HTML i w
+menuButton text action isEnabled = 
   HH.button 
     [ 
       HP.class_ (HC.ClassName "menuButton"), 
-      HE.onClick \_ -> Just action
+      HE.onClick \_ -> Just action,
+      HP.enabled isEnabled
     ] 
     [ 
       HH.text text
