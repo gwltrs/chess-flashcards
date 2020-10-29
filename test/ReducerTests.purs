@@ -543,3 +543,24 @@ reducerTests = suite "Reducer" do
         }
         Retry
       )
+
+  test "User reveals puzzle name" do
+
+    -- Should simply replace the Just move with Nothing
+
+    Assert.equal 
+      { 
+        puzzles: [openGamePuzzle, ohcPuzzle], 
+        reviewStack: ["Open Game"], 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") false, 
+        alert: Just (ThisIsTheName ohcName)
+      }
+      (reducer 
+        { 
+          puzzles: [openGamePuzzle, ohcPuzzle], 
+          reviewStack: ["Open Game"], 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") false, 
+          alert: Nothing
+        }
+        ShowName
+      )

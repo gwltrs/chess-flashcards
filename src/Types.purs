@@ -67,7 +67,8 @@ data Alert =
   DuplicateFEN |
   InvalidFile |
   NoPuzzlesForReview |
-  AllPuzzlesReviewed
+  AllPuzzlesReviewed |
+  ThisIsTheName Name
 
 derive instance eqAlert :: Eq Alert
 
@@ -79,6 +80,7 @@ instance showAlert :: Show Alert where
     InvalidFile -> "InvalidFile"
     NoPuzzlesForReview -> "NoPuzzlesForReview"
     AllPuzzlesReviewed -> "AllPuzzlesReviewed"
+    ThisIsTheName name -> "ThisIsTheName" <> " " <> name
 
 data Action = 
   NewFile | 
@@ -94,5 +96,5 @@ data Action =
   SavePuzzle |
   BackToMain | 
   Retry | 
-  ShowTitle | 
+  ShowName | 
   CopyFEN

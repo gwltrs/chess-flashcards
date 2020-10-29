@@ -51,7 +51,7 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
               menuButton "Back" BackToMain,
               menuButton "Retry" Retry,
               menuButton "Next" Review,
-              menuButton "Show Title" ShowTitle,
+              menuButton "Show Name" ShowName,
               menuButton "Copy FEN" CopyFEN
             ]
 
@@ -85,6 +85,7 @@ alertText = case _ of
   InvalidFile -> "The selected file doesn't have the expected format"
   NoPuzzlesForReview -> "No puzzles are up for review at this time"
   AllPuzzlesReviewed -> "You completed all the puzzles that are up for review"
+  ThisIsTheName name -> name
 
 boardIsVisible :: State -> Boolean
 boardIsVisible state = 
