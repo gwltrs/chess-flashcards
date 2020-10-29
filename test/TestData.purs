@@ -35,7 +35,7 @@ endgamePuzzle1 =
   { 
     name: "endgame",
     fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
-    move: "d7d8k",
+    move: "d7d8n",
     box: 2,
     lastDrilledAt: 1601324525
   }
@@ -79,7 +79,7 @@ twoEndgamePuzzlesJSON = """
     { 
       name: "endgame",
       fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
-      move: "d7d8k",
+      move: "d7d8n",
       box: 2,
       lastDrilledAt: 1601324525
     },
