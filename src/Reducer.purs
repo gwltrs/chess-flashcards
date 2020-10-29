@@ -104,6 +104,8 @@ reducer state action =
       state { view = ReviewingPuzzle puzzleName fen (Just move) false }
     Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) false) ->
       state { view = ReviewingPuzzle puzzleName fen Nothing false }
+    Tuple ShowName (ReviewingPuzzle puzzleName _ _ false) -> 
+      state { alert = Just (ThisIsTheName puzzleName) }
     Tuple _ _ ->
       state
 
