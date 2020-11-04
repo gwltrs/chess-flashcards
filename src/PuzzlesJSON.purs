@@ -1,8 +1,13 @@
 module PuzzlesJSON where
 
+import Data.Semigroup ((<>))
 import Data.Maybe (Maybe(..))
 import Simple.JSON (readJSON)
 import Data.Either (Either(..))
+import Data.Functor ((<#>))
+import Data.Show
+import Data.String.Common (joinWith)
+import Data.Function ((#))
 
 import Types (Puzzle)
 
@@ -14,9 +19,20 @@ import Types (Puzzle)
 makePuzzlesJSON :: Array Puzzle -> String
 makePuzzlesJSON = makePuzzlesJSONImpl
 
--- Implementing this via FFI instead of Simple.JSON because there isn't
--- a way to do make pretty json with Simple.JSON as far as I know. 
-foreign import makePuzzlesJSONImpl :: Array Puzzle -> String
+-- Now implementing this in manually since the prebuilt solutions
+-- aren't generating the puzzle JSON properties in a deterministic ordering. 
+makePuzzlesJSONImpl :: Array Puzzle -> String
+makePuzzlesJSONImpl puzzles = puzzles
+  <#> (\p -> 
+    "  {\n" <>
+    "    \"name\": \"" <> p.name <> "\",\n" <>
+    "    \"fen\": \"" <> p.fen <> "\",\n" <>
+    "    \"move\": \"" <> p.move <> "\",\n" <>
+    "    \"box\": " <> show p.box <> ",\n" <>
+    "    \"lastDrilledAt\": " <> show p.lastDrilledAt <> "\n" <>
+    "  }")
+  # joinWith ",\n"
+  # (\ps -> "[\n" <> ps <> "\n]")
 
 parsePuzzlesJSON :: String -> Maybe (Array Puzzle)
 parsePuzzlesJSON jsonString =

@@ -13321,11 +13321,6 @@ var PS = {};
   exports["runUI"] = runUI;
 })(PS);
 (function(exports) {
-  exports.makePuzzlesJSONImpl = (puzzles) => {
-    return JSON.stringify(puzzles, null, 2);
-  };
-})(PS["PuzzlesJSON"] = PS["PuzzlesJSON"] || {});
-(function(exports) {
   exports._parseJSON = JSON.parse;
 })(PS["Simple.JSON"] = PS["Simple.JSON"] || {});
 (function(exports) {
@@ -13543,9 +13538,11 @@ var PS = {};
   "use strict";
   $PS["PuzzlesJSON"] = $PS["PuzzlesJSON"] || {};
   var exports = $PS["PuzzlesJSON"];
-  var $foreign = $PS["PuzzlesJSON"];
   var Data_Either = $PS["Data.Either"];
+  var Data_Functor = $PS["Data.Functor"];
   var Data_Maybe = $PS["Data.Maybe"];
+  var Data_Show = $PS["Data.Show"];
+  var Data_String_Common = $PS["Data.String.Common"];
   var Data_Symbol = $PS["Data.Symbol"];
   var Simple_JSON = $PS["Simple.JSON"];                
   var parsePuzzlesJSON = function (jsonString) {
@@ -13566,9 +13563,16 @@ var PS = {};
       if (v instanceof Data_Either.Left) {
           return Data_Maybe.Nothing.value;
       };
-      throw new Error("Failed pattern match at PuzzlesJSON (line 23, column 3 - line 27, column 14): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at PuzzlesJSON (line 39, column 3 - line 43, column 14): " + [ v.constructor.name ]);
   };
-  var makePuzzlesJSON = $foreign.makePuzzlesJSONImpl;
+  var makePuzzlesJSONImpl = function (puzzles) {
+      return (function (ps) {
+          return "[\x0a" + (ps + "\x0a]");
+      })(Data_String_Common.joinWith(",\x0a")(Data_Functor.mapFlipped(Data_Functor.functorArray)(puzzles)(function (p) {
+          return "  {\x0a" + ("    \"name\": \"" + (p.name + ("\",\x0a" + ("    \"fen\": \"" + (p.fen + ("\",\x0a" + ("    \"move\": \"" + (p.move + ("\",\x0a" + ("    \"box\": " + (Data_Show.show(Data_Show.showInt)(p.box) + (",\x0a" + ("    \"lastDrilledAt\": " + (Data_Show.show(Data_Show.showInt)(p.lastDrilledAt) + ("\x0a" + "  }")))))))))))))));
+      })));
+  };
+  var makePuzzlesJSON = makePuzzlesJSONImpl;
   exports["makePuzzlesJSON"] = makePuzzlesJSON;
   exports["parsePuzzlesJSON"] = parsePuzzlesJSON;
 })(PS);
