@@ -1,6 +1,6 @@
 module Render where
 
-import Prelude (not, (>>>))
+import Prelude ((>>>), (>>=), (==))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -10,10 +10,9 @@ import Data.Maybe (Maybe(..), isJust, fromMaybe)
 import Data.Semigroup ((<>))
 import Data.Functor ((<#>))
 import Data.Function ((#))
-import Data.Array (singleton)
-import Data.Eq ((/=))
+import Data.Array (singleton, findIndex, (!!))
 
-import Types (Action(..), State, View(..), Alert(..), FirstAttempt(..))
+import Types (Action(..), State, View(..), Alert(..))
 import File (openFileDialogInput)
 import Constants (nextButtonID)
 
@@ -114,4 +113,12 @@ boardIsVisible state =
     _ -> false
 
 nextButtonIsEnabled :: State -> Boolean
-nextButtonIsEnabled state = false
+nextButtonIsEnabled state = 
+  case state.view of
+    ReviewingPuzzle puzzleName _ (Just move) _ ->
+      findIndex (\p -> p.name == puzzleName) state.puzzles
+        >>= (\i -> state.puzzles !! i)
+        <#> (\p -> p.move == move)
+        # fromMaybe false
+    _ ->
+      false

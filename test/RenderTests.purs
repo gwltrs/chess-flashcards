@@ -1,9 +1,9 @@
 module RenderTests where
 
-import Prelude (Unit, discard, (<>))
+import Prelude (Unit, discard)
 import Control.Monad.Free (Free)
 import Test.Unit (suite, test, TestF)
-import Types (Action(..), Alert(..), View(..), FirstAttempt(..))
+import Types (View(..))
 import Test.Unit.Assert as Assert
 import Data.Maybe (Maybe(..))
 

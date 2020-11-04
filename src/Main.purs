@@ -123,10 +123,3 @@ nowInSeconds = now
   # map unwrap 
   # map (\x -> x / 1000.0)
   # map round
-
---asdf = do
---  w <- H.liftEffect window
---  et <- H.liftEffect (document w # map toEventTarget)
---  el <- H.liftEffect (eventListener (\e -> if (eventCode e) == "Space" then (alert "spaaaace" w) else pure unit))
---  H.liftEffect (addEventListener keydown el true et)
---  pure unit
