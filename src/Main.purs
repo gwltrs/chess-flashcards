@@ -13,7 +13,7 @@ import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.VDom.Driver (runUI)
 import Web.HTML (window)
-import Web.HTML.Window (alert)
+import Web.HTML.Window (alert, document)
 import Control.Applicative (pure)
 import Data.Functor (map)
 import Data.Newtype (unwrap)
@@ -21,6 +21,9 @@ import Data.Int (round)
 import Data.Foldable (find)
 import Effect.Random (random)
 import Data.Tuple (Tuple(..))
+import Web.Event.EventTarget (eventListener, addEventListener)
+import Web.HTML.HTMLDocument (toEventTarget)
+import Web.UIEvent.KeyboardEvent.EventTypes (keydown)
 
 import Types
 import Reducer (reducer)
@@ -28,8 +31,9 @@ import Render (render, alertText)
 import Chess (getMove)
 import File (saveFile, openFileDialog)
 import PuzzlesJSON (makePuzzlesJSON)
-import Constants (maxVariance)
+import Constants (maxVariance, nextButtonID)
 import Clipboard (copyToClipboard)
+import DOM (eventCode, click)
 
 main :: Effect Unit
 main = HA.runHalogenAff do
@@ -68,6 +72,17 @@ handleAction action = do
 
   -- Firing off the rest of the Effects and Affs
   case Tuple action stateAfterAction.view of
+    Tuple NewFile (MainMenu _ _) -> do
+      pure unit
+    Tuple (LoadFile _ _) (MainMenu _ _) -> do
+      w <- H.liftEffect window
+      et <- H.liftEffect (document w # map toEventTarget)
+      el <- H.liftEffect (eventListener (\e -> 
+        if (eventCode e) == "Space" then
+          click nextButtonID
+        else
+          pure unit))
+      H.liftEffect (addEventListener keydown el true et)
     Tuple CreatePuzzle (CreatingPuzzle _ fen Nothing) -> do
       move <- H.liftAff (getMove fen "")
       nowTimestamp <- H.liftEffect nowInSeconds
@@ -108,3 +123,10 @@ nowInSeconds = now
   # map unwrap 
   # map (\x -> x / 1000.0)
   # map round
+
+--asdf = do
+--  w <- H.liftEffect window
+--  et <- H.liftEffect (document w # map toEventTarget)
+--  el <- H.liftEffect (eventListener (\e -> if (eventCode e) == "Space" then (alert "spaaaace" w) else pure unit))
+--  H.liftEffect (addEventListener keydown el true et)
+--  pure unit

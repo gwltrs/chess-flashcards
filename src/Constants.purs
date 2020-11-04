@@ -16,3 +16,6 @@ secondsInADay = 86_400
 
 maxVariance :: Number
 maxVariance = 0.1
+
+nextButtonID :: String
+nextButtonID = "nextButton"

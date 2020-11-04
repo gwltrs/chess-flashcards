@@ -6,11 +6,16 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Core as HC
-import Data.Maybe (Maybe(..), isJust)
+import Data.Maybe (Maybe(..), isJust, fromMaybe)
 import Data.Semigroup ((<>))
+import Data.Functor ((<#>))
+import Data.Function ((#))
+import Data.Array (singleton)
+import Data.Eq ((/=))
 
-import Types (Action(..), State, View(..), Alert(..))
+import Types (Action(..), State, View(..), Alert(..), FirstAttempt(..))
 import File (openFileDialogInput)
+import Constants (nextButtonID)
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
@@ -21,39 +26,39 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
         LoadingFile -> 
           HH.div_
             [ 
-              menuButton "New" NewFile true,
-              menuButton "Load" OpenFileDialog true
+              menuButton Nothing "New" NewFile true,
+              menuButton Nothing "Load" OpenFileDialog true
             ]
         MainMenu _ _ -> 
           HH.div_
             [ 
-              menuButton "Save" SaveFile true,
+              menuButton Nothing "Save" SaveFile true,
               HH.br_,
-              menuButton "Review" Review true,
+              menuButton Nothing "Review" Review true,
               HH.br_,
               menuInput "Name" UpdatePuzzleName,
               menuInput "FEN" UpdateFEN,
-              menuButton "Create" CreatePuzzle true
+              menuButton Nothing "Create" CreatePuzzle true
             ]
         CreatingPuzzle puzzleName _ move ->
           HH.div_
             [ 
-              menuButton "Back" BackToMain true,
+              menuButton Nothing "Back" BackToMain true,
               HH.input [
                 HP.class_ (HC.ClassName "label"),
                 HP.value puzzleName,
                 HP.readOnly true
               ],
-              menuButton "Save" SavePuzzle (isJust move)
+              menuButton Nothing "Save" SavePuzzle (isJust move)
             ]
-        ReviewingPuzzle _ _ _ isFirst ->
+        ReviewingPuzzle _ _ _ firstAttempt ->
           HH.div_
             [
-              menuButton "Back" BackToMain true,
-              menuButton "Retry" Retry (not isFirst),
-              menuButton "Next" Review (not isFirst),
-              menuButton "Show Name" ShowName (not isFirst),
-              menuButton "Copy FEN" CopyFEN (not isFirst)
+              menuButton Nothing "Back" BackToMain true,
+              menuButton Nothing "Retry" Retry (firstAttempt /= NoAttemptsYet),
+              menuButton (Just nextButtonID) "Next" Review (nextButtonIsEnabled state),
+              menuButton Nothing "Show Name" ShowName (firstAttempt /= NoAttemptsYet),
+              menuButton Nothing "Copy FEN" CopyFEN (firstAttempt /= NoAttemptsYet)
             ]
 
     chessboardDiv :: H.ComponentHTML Action () m
@@ -67,14 +72,17 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
           ] <> noDisplayClassArray)
           []
 
-menuButton :: forall w i. String -> w -> Boolean -> HC.HTML i w
-menuButton text action isEnabled = 
+menuButton :: forall w i. Maybe String -> String -> w -> Boolean -> HC.HTML i w
+menuButton id text action isEnabled   = 
   HH.button 
-    [ 
-      HP.class_ (HC.ClassName "menuButton"), 
-      HE.onClick \_ -> Just action,
-      HP.enabled isEnabled
-    ] 
+    (
+      [ 
+        HP.class_ (HC.ClassName "menuButton"), 
+        HE.onClick \_ -> Just action,
+        HP.enabled isEnabled
+      ] <> 
+      (id <#> HP.id_ <#> singleton # fromMaybe [])
+    )
     [ 
       HH.text text
     ]
@@ -84,7 +92,7 @@ menuInput placeholder actionMaker =
   HH.input
     [
       HP.placeholder placeholder,
-      HP.class_ (HC.ClassName "textField"), 
+      HP.class_ (HC.ClassName "textField"),
       HE.onValueChange (actionMaker >>> Just)
     ]
 
@@ -104,3 +112,6 @@ boardIsVisible state =
     CreatingPuzzle _ _ _ -> true
     ReviewingPuzzle _ _ _ _ -> true
     _ -> false
+
+nextButtonIsEnabled :: State -> Boolean
+nextButtonIsEnabled state = false

@@ -9,7 +9,7 @@ import Data.Eq ((==))
 import Data.Array (elemIndex, filter, mapMaybe, sortBy, head, tail, findIndex, (!!), alterAt)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
-import Data.Functor (map)
+import Data.Functor (map, (<#>))
 import Data.String.Regex (regex, match)
 import Data.String.Regex.Flags (multiline)
 import Data.Either (fromRight)
@@ -23,7 +23,7 @@ import Data.Semiring (add, mul)
 import Data.String.Common (localeCompare)
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor)
+import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor, FirstAttempt(..))
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
@@ -74,7 +74,7 @@ reducer state action =
     Tuple Review _ ->
       case head state.reviewStack >>= getPuzzleByName state.puzzles of
         Just puzzleForReview ->
-          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing true }
+          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing NoAttemptsYet }
         Nothing ->
           case state.view of
             MainMenu _ _ ->
@@ -83,14 +83,18 @@ reducer state action =
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state
-    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing true) ->
+    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing NoAttemptsYet) ->
       let
-        updateStateView s = s { view = ReviewingPuzzle puzzleName fen (Just move) false }
         updateStateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
         indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
         isCorrect = indexInPuzzles
           >>= (\i -> state.puzzles !! i)
           # map (\p -> p.move == move)
+        updateStateView s = s { view = 
+          isCorrect
+            <#> (\ic -> ReviewingPuzzle puzzleName fen (Just move) if ic then Correct else Incorrect)
+            # (fromMaybe s.view)
+        }
         updateStatePuzzles s = s { puzzles =
           (lift2 Tuple isCorrect indexInPuzzles)
             >>= (\tup -> updatePuzzles (fst tup) (snd tup) now varianceFactor s.puzzles)
@@ -100,11 +104,11 @@ reducer state action =
           # updateStateView
           # updateStateReviewStack
           # updateStatePuzzles
-    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing false) ->
-      state { view = ReviewingPuzzle puzzleName fen (Just move) false }
-    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) false) ->
-      state { view = ReviewingPuzzle puzzleName fen Nothing false }
-    Tuple ShowName (ReviewingPuzzle puzzleName _ _ false) -> 
+    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing firstAttempt) ->
+      state { view = ReviewingPuzzle puzzleName fen (Just move) firstAttempt }
+    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) firstAttempt) ->
+      state { view = ReviewingPuzzle puzzleName fen Nothing firstAttempt }
+    Tuple ShowName (ReviewingPuzzle puzzleName _ _ _) -> 
       state { alert = Just (ThisIsTheName puzzleName) }
     Tuple _ _ ->
       state
