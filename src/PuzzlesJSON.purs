@@ -1,7 +1,7 @@
 module PuzzlesJSON where
 
 import Data.Maybe (Maybe(..))
-import Simple.JSON (readJSON, writeJSON)
+import Simple.JSON (readJSON)
 import Data.Either (Either(..))
 
 import Types (Puzzle)
@@ -12,8 +12,11 @@ import Types (Puzzle)
 -- roundtrip tests in a TDD sequence (writing tests first).
 
 makePuzzlesJSON :: Array Puzzle -> String
-makePuzzlesJSON puzzles = 
-  writeJSON puzzles
+makePuzzlesJSON = makePuzzlesJSONImpl
+
+-- Implementing this via FFI instead of Simple.JSON because there isn't
+-- a way to do make pretty json with Simple.JSON as far as I know. 
+foreign import makePuzzlesJSONImpl :: Array Puzzle -> String
 
 parsePuzzlesJSON :: String -> Maybe (Array Puzzle)
 parsePuzzlesJSON jsonString =
