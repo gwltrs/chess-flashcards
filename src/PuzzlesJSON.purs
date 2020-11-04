@@ -19,7 +19,7 @@ import Types (Puzzle)
 makePuzzlesJSON :: Array Puzzle -> String
 makePuzzlesJSON = makePuzzlesJSONImpl
 
--- Now implementing this in manually since the prebuilt solutions
+-- Now implementing this manually since the prebuilt solutions
 -- aren't generating the puzzle JSON properties in a deterministic ordering. 
 makePuzzlesJSONImpl :: Array Puzzle -> String
 makePuzzlesJSONImpl puzzles = puzzles
