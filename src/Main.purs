@@ -15,7 +15,7 @@ import Halogen.VDom.Driver (runUI)
 import Web.HTML (window)
 import Web.HTML.Window (alert, document)
 import Control.Applicative (pure)
-import Data.Functor (map)
+import Data.Functor ((<#>))
 import Data.Newtype (unwrap)
 import Data.Int (round)
 import Data.Foldable (find)
@@ -76,7 +76,7 @@ handleAction action = do
       pure unit
     Tuple (LoadFile _ _) (MainMenu _ _) -> do
       w <- H.liftEffect window
-      et <- H.liftEffect (document w # map toEventTarget)
+      et <- H.liftEffect (document w <#> toEventTarget)
       el <- H.liftEffect (eventListener (\e -> 
         if (eventCode e) == "Space" then
           click nextButtonID
@@ -113,13 +113,13 @@ handleAction action = do
 expectedMove :: State -> Move
 expectedMove state = case state.view of
   ReviewingPuzzle puzzleName _ _ _ ->
-    state.puzzles # find (\p -> p.name == puzzleName) # map (\p -> p.move) # fromMaybe ""
+    state.puzzles # find (\p -> p.name == puzzleName) <#> (\p -> p.move) # fromMaybe ""
   _ -> 
     ""
 
 nowInSeconds :: Effect Int
 nowInSeconds = now
-  # map unInstant 
-  # map unwrap 
-  # map (\x -> x / 1000.0)
-  # map round
+  <#> unInstant 
+  <#> unwrap
+  <#> (\x -> x / 1000.0)
+  <#> round

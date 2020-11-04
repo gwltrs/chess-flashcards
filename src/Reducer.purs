@@ -9,7 +9,7 @@ import Data.Eq ((==))
 import Data.Array (elemIndex, filter, mapMaybe, sortBy, head, tail, findIndex, (!!), alterAt)
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
-import Data.Functor (map, (<#>))
+import Data.Functor ((<#>))
 import Data.String.Regex (regex, match)
 import Data.String.Regex.Flags (multiline)
 import Data.Either (fromRight)
@@ -47,7 +47,7 @@ reducer state action =
           state { alert = Just MissingNameOrFEN }
         else if not (fenIsValid fen) then 
           state { alert = Just InvalidFEN }
-        else if state.puzzles # (map \p -> p.fen) # elemIndex sanitizedFEN # isJust then
+        else if state.puzzles <#> (\p -> p.fen) # elemIndex sanitizedFEN # isJust then
           state { alert = Just DuplicateFEN }
         else
           state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) sanitizedFEN Nothing }
@@ -89,7 +89,7 @@ reducer state action =
         indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
         isCorrect = indexInPuzzles
           >>= (\i -> state.puzzles !! i)
-          # map (\p -> p.move == move)
+          <#> (\p -> p.move == move)
         updateStateView s = s { view = 
           isCorrect
             <#> Just
@@ -127,7 +127,7 @@ incrementName puzzles name =
     let
       previousIncrementsRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" multiline))
       currentIncrement = puzzles
-        # (map \p -> p.name) 
+        <#> (\p -> p.name) 
         # (mapMaybe (match previousIncrementsRegex))
         # (mapMaybe \nonEmptyArr -> 
             case toArray nonEmptyArr of
@@ -147,10 +147,10 @@ generateReviewStack nowSeconds puzzles =
     secondsInADay = 60 * 60 * 24
   in
     puzzles
-      # (map \p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
+      <#> (\p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
       # (filter \tuple -> tuple.overdue > 0)
       # (sortBy \l r -> compare r.overdue l.overdue)
-      # (map \tuple2 -> tuple2.name)
+      <#> (\tuple2 -> tuple2.name)
 
 -- Defined with this param order for convenient use with bind
 getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
@@ -160,7 +160,7 @@ getPuzzleByName puzzles name =
 updatePuzzles :: Boolean -> Int -> TimestampSeconds -> VarianceFactor -> Array Puzzle -> Maybe (Array Puzzle)
 updatePuzzles isCorrect index now varianceFactor puzzles =
   let
-    oldBox = (puzzles !! index) # map (\p -> p.box) # fromMaybe 1
+    oldBox = (puzzles !! index) <#> (\p -> p.box) # fromMaybe 1
     newBox = if isCorrect then min maxBox (oldBox * factorForNextBox) else firstBox
     newTimestamp = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round)
   in
