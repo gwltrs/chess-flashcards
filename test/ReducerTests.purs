@@ -3,7 +3,7 @@ module ReducerTests where
 import Prelude (Unit, discard, (<>))
 import Control.Monad.Free (Free)
 import Test.Unit (suite, test, TestF)
-import Types (Action(..), Alert(..), View(..), FirstAttempt(..))
+import Types (Action(..), Alert(..), View(..))
 import Test.Unit.Assert as Assert
 import Data.Maybe (Maybe(..))
 
@@ -306,7 +306,7 @@ reducerTests = suite "Reducer" do
     -- Puzzles aren't removed from the review stack until they are attempted.
 
     Assert.equal 
-      { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: ReviewingPuzzle "Open Game" openGameFEN Nothing NoAttemptsYet, alert: Nothing }
+      { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: ReviewingPuzzle "Open Game" openGameFEN Nothing Nothing, alert: Nothing }
       (reducer 
         { puzzles: [openGamePuzzle], reviewStack: ["Open Game"], view: MainMenu "a" "b", alert: Nothing }
         Review
@@ -316,7 +316,7 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN Nothing NoAttemptsYet, 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
         alert: Nothing
       }
       (reducer 
@@ -343,14 +343,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle "Open Game" openGameFEN Nothing NoAttemptsYet, 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing Nothing, 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
           alert: Nothing
         }
         Review
@@ -360,14 +360,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: ["Open Game", endgamePuzzle1.name], 
-        view: ReviewingPuzzle "Open Game" openGameFEN Nothing NoAttemptsYet, 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing Nothing, 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: ["Open Game", endgamePuzzle1.name], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
           alert: Nothing
         }
         Review
@@ -377,14 +377,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: ["Open Game", endgamePuzzle1.name], 
-        view: ReviewingPuzzle "Open Game" openGameFEN Nothing NoAttemptsYet, 
+        view: ReviewingPuzzle "Open Game" openGameFEN Nothing Nothing, 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: ["Open Game", endgamePuzzle1.name], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
           alert: Nothing
         }
         Review
@@ -396,14 +396,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: [], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
         alert: Just AllPuzzlesReviewed
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: [], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
           alert: Nothing
         }
         Review
@@ -413,14 +413,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
         reviewStack: [], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
         alert: Just AllPuzzlesReviewed
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle, endgamePuzzle1], 
           reviewStack: [], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
           alert: Nothing
         }
         Review
@@ -436,14 +436,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
           alert: Nothing
         }
         (AttemptPuzzle ohcMove 1601324534 0.5) -- Correct
@@ -453,14 +453,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
           alert: Nothing
         }
         (AttemptPuzzle ohcMove 1601324534 0.5) -- Correct
@@ -470,14 +470,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Correct, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
           alert: Nothing
         }
         (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
@@ -487,14 +487,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: [ohcName, "Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
           alert: Nothing
         }
         (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
@@ -507,14 +507,14 @@ reducerTests = suite "Reducer" do
         -- The new timestamp is "now" since the variance factor is 0
         puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing NoAttemptsYet, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
         (AttemptPuzzle "d1d7" 1_000_000_000 0.0)
@@ -525,14 +525,14 @@ reducerTests = suite "Reducer" do
         -- The new timestamp is equal to 2_000_000_000 - seconds-in-half-of-a-day
         puzzles: [endgamePuzzle1 { box = 1, lastDrilledAt = 1_999_956_800} , endgamePuzzle2], 
         reviewStack: [endgamePuzzle2.name], 
-        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just "a1h8") Incorrect, 
+        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just "a1h8") (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: twoEndgamePuzzles, 
           reviewStack: [endgamePuzzle1.name, endgamePuzzle2.name], 
-          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing NoAttemptsYet, 
+          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing Nothing, 
           alert: Nothing
         }
         (AttemptPuzzle "a1h8" 2_000_000_000 0.5)
@@ -545,14 +545,14 @@ reducerTests = suite "Reducer" do
         -- The new timestamp is equal to 1_000_000_000 - seconds-in-a-day (since the new box is 4 and the variance factor is 1/4)
         puzzles: [endgamePuzzle1 { box = 4, lastDrilledAt = 999_913_600}, endgamePuzzle2], 
         reviewStack: [endgamePuzzle2.name], 
-        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just endgamePuzzle1.move) Correct, 
+        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just endgamePuzzle1.move) (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: twoEndgamePuzzles, 
           reviewStack: [endgamePuzzle1.name, endgamePuzzle2.name], 
-          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing NoAttemptsYet, 
+          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing Nothing, 
           alert: Nothing
         }
         (AttemptPuzzle endgamePuzzle1.move 1_000_000_000 0.25)
@@ -564,14 +564,14 @@ reducerTests = suite "Reducer" do
         -- New box should be capped at 64.
         puzzles: [openGamePuzzle, ohcPuzzle { box = 64, lastDrilledAt = 1_999_447_040 }], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle { box = 40 }], 
           reviewStack: [ohcName, "Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing NoAttemptsYet, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
         (AttemptPuzzle ohcMove 2_000_000_000 0.1)
@@ -585,14 +585,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN Nothing Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just false), 
           alert: Nothing
         }
         Retry
@@ -602,14 +602,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN Nothing Correct, 
+        view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle { box = 1, lastDrilledAt = 1_000_000_000 }], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
           alert: Nothing
         }
         Retry
@@ -619,14 +619,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [endgamePuzzle1 { box = 4, lastDrilledAt = 999_913_600 }, endgamePuzzle2], 
         reviewStack: [endgamePuzzle2.name], 
-        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing Incorrect, 
+        view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing (Just false), 
         alert: Nothing
       }
       (reducer 
         { 
           puzzles: [endgamePuzzle1 { box = 4, lastDrilledAt = 999_913_600 }, endgamePuzzle2], 
           reviewStack: [endgamePuzzle2.name], 
-          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just endgamePuzzle1.move) Incorrect, 
+          view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen (Just endgamePuzzle1.move) (Just false), 
           alert: Nothing
         }
         Retry
@@ -640,14 +640,14 @@ reducerTests = suite "Reducer" do
       { 
         puzzles: [openGamePuzzle, ohcPuzzle], 
         reviewStack: ["Open Game"], 
-        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Incorrect, 
+        view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just false), 
         alert: Just (ThisIsTheName ohcName)
       }
       (reducer 
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "d1d7") (Just false), 
           alert: Nothing
         }
         ShowName

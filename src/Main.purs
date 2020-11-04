@@ -104,7 +104,7 @@ handleAction action = do
       textInFile <- H.liftAff openFileDialog
       nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (LoadFile textInFile nowTimestamp)
-    Tuple CopyFEN (ReviewingPuzzle _ fen _ _) -> do
+    Tuple CopyFEN (ReviewingPuzzle _ fen _ (Just _)) -> do
       H.liftEffect (copyToClipboard fen)
     _ ->
       pure unit

@@ -23,7 +23,7 @@ import Data.Semiring (add, mul)
 import Data.String.Common (localeCompare)
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor, FirstAttempt(..))
+import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor)
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
@@ -74,7 +74,7 @@ reducer state action =
     Tuple Review _ ->
       case head state.reviewStack >>= getPuzzleByName state.puzzles of
         Just puzzleForReview ->
-          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing NoAttemptsYet }
+          state { view = ReviewingPuzzle puzzleForReview.name puzzleForReview.fen Nothing Nothing }
         Nothing ->
           case state.view of
             MainMenu _ _ ->
@@ -83,7 +83,7 @@ reducer state action =
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state
-    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing NoAttemptsYet) ->
+    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing Nothing) ->
       let
         updateStateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
         indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
@@ -92,7 +92,8 @@ reducer state action =
           # map (\p -> p.move == move)
         updateStateView s = s { view = 
           isCorrect
-            <#> (\ic -> ReviewingPuzzle puzzleName fen (Just move) if ic then Correct else Incorrect)
+            <#> Just
+            <#> (ReviewingPuzzle puzzleName fen (Just move))
             # (fromMaybe s.view)
         }
         updateStatePuzzles s = s { puzzles =
@@ -104,11 +105,11 @@ reducer state action =
           # updateStateView
           # updateStateReviewStack
           # updateStatePuzzles
-    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing firstAttempt) ->
-      state { view = ReviewingPuzzle puzzleName fen (Just move) firstAttempt }
-    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) firstAttempt) ->
-      state { view = ReviewingPuzzle puzzleName fen Nothing firstAttempt }
-    Tuple ShowName (ReviewingPuzzle puzzleName _ _ _) -> 
+    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt)) ->
+      state { view = ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt) }
+    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt)) ->
+      state { view = ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt) }
+    Tuple ShowName (ReviewingPuzzle puzzleName _ _ (Just firstAttempt)) -> 
       state { alert = Just (ThisIsTheName puzzleName) }
     Tuple _ _ ->
       state

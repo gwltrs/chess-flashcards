@@ -21,7 +21,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
           alert: Nothing
         }
       )
@@ -32,7 +32,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
           alert: Nothing
         }
       )
@@ -45,7 +45,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") (Just true), 
           alert: Nothing
         }
       )
@@ -56,7 +56,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") (Just false), 
           alert: Nothing
         }
       )
@@ -72,7 +72,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing NoAttemptsYet, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
       )
@@ -83,7 +83,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Correct, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
           alert: Nothing
         }
       )
@@ -94,7 +94,7 @@ renderTests = suite "Render" do
         { 
           puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
-          view: ReviewingPuzzle ohcName ohcFEN Nothing Incorrect, 
+          view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
           alert: Nothing
         }
       )

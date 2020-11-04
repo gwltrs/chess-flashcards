@@ -50,6 +50,12 @@ data View =
   CreatingPuzzle Name FEN (Maybe Move) |
   ReviewingPuzzle Name FEN (Maybe Move) FirstAttempt
 
+-- Represents the result of the user's first attempt of the puzzle.
+-- Nothing -> Not attempted yet.
+-- Just true -> Correct first attempt.
+-- Just false -> Incorrect first attempt.
+type FirstAttempt = Maybe Boolean
+
 derive instance eqView :: Eq View
 
 instance showView :: Show View where
@@ -57,21 +63,7 @@ instance showView :: Show View where
     LoadingFile -> "LoadingFile"
     MainMenu puzzleName fen -> "MainMenu " <> show puzzleName <> " " <> show fen
     CreatingPuzzle puzzleName fen move -> "CreatingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move
-    ReviewingPuzzle puzzleName fen move isFirstAttempt -> "ReviewingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move <> show isFirstAttempt
-
-data FirstAttempt = 
-  NoAttemptsYet |
-  Correct |
-  Incorrect
-
-derive instance eqFirstAttempt :: Eq FirstAttempt
-
-instance showFirstAttempt :: Show FirstAttempt where
-  show = case _ of
-    NoAttemptsYet -> "NoAttemptsYet"
-    Correct -> "Correct"
-    Incorrect -> "Incorrect"
-
+    ReviewingPuzzle puzzleName fen move firstAttempt -> "ReviewingPuzzle " <> show puzzleName <> " " <> show fen <> " " <> show move <> show firstAttempt
 
 data Alert = 
   MissingNameOrFEN |

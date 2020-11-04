@@ -55,10 +55,10 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
           HH.div_
             [
               menuButton Nothing "Back" BackToMain true,
-              menuButton Nothing "Retry" Retry (firstAttempt /= NoAttemptsYet),
+              menuButton Nothing "Retry" Retry (isJust firstAttempt),
               menuButton (Just nextButtonID) "Next" Review (nextButtonIsEnabled state),
-              menuButton Nothing "Show Name" ShowName (firstAttempt /= NoAttemptsYet),
-              menuButton Nothing "Copy FEN" CopyFEN (firstAttempt /= NoAttemptsYet)
+              menuButton Nothing "Show Name" ShowName (isJust firstAttempt),
+              menuButton Nothing "Copy FEN" CopyFEN (isJust firstAttempt)
             ]
 
     chessboardDiv :: H.ComponentHTML Action () m
