@@ -131,8 +131,12 @@ incrementName puzzles name =
         # (mapMaybe (match previousIncrementsRegex))
         # (mapMaybe \nonEmptyArr -> 
             case toArray nonEmptyArr of
-              [Just _, Just _, Just intString] -> fromString intString
-              _ -> Nothing)
+              [Just _, Just firstCapture, Just intString] -> 
+                fromString intString <#> Tuple firstCapture
+              _ ->
+                Nothing)
+        # filter (\tup -> fst tup == name)
+        <#> snd
         # (foldr max 1)
         # add 1
     in
