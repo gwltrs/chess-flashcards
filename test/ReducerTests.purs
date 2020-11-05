@@ -196,7 +196,21 @@ reducerTests = suite "Reducer" do
       (reducer 
         { puzzles: twoEndgamePuzzles, reviewStack: [], view: MainMenu "endgame" najdorfFENWithValidEnPassant, alert: Nothing }
         CreatePuzzle
-      ) 
+      )
+
+    Assert.equal 
+      { puzzles: [openGamePuzzle, largeIncrementPuzzle], reviewStack: [], view: CreatingPuzzle "Open Game #2" ohcFEN Nothing, alert: Nothing }
+      (reducer 
+        { puzzles: [openGamePuzzle, largeIncrementPuzzle], reviewStack: [], view: MainMenu "   Open Game " ohcFEN, alert: Nothing }
+        CreatePuzzle
+      )
+
+    Assert.equal 
+      { puzzles: twoEndgamePuzzles <> [largeIncrementPuzzle], reviewStack: [], view: CreatingPuzzle "endgame #3" najdorfFENWithValidEnPassant Nothing, alert: Nothing }
+      (reducer 
+        { puzzles: twoEndgamePuzzles <> [largeIncrementPuzzle], reviewStack: [], view: MainMenu "endgame" najdorfFENWithValidEnPassant, alert: Nothing }
+        CreatePuzzle
+      )
 
   test "User adds move to new puzzle" do
 

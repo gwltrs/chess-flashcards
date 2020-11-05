@@ -70,6 +70,16 @@ openGamePuzzle =
     lastDrilledAt: 0
   }
 
+largeIncrementPuzzle :: Puzzle
+largeIncrementPuzzle = 
+  {
+    name: "strategy #100",
+    fen: "r4rk1/2qnpp1p/p1p3p1/4N3/P2P4/4P3/5PPP/1R1Q1RK1 w - -",
+    move: "d5d7",
+    box: 4,
+    lastDrilledAt: 1604590319
+  }
+
 twoEndgamePuzzles :: Array Puzzle
 twoEndgamePuzzles = [endgamePuzzle1, endgamePuzzle2]
 
