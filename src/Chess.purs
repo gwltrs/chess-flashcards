@@ -11,8 +11,6 @@ foreign import fenIsValid :: String -> Boolean
 -- Behavior is undefined when (fenIsValid fen) == false
 foreign import sanitizeFEN :: String -> String
 
-foreign import getMoveImpl :: String -> String -> Effect (Promise String)
-
 -- Since the app only gets one move from the user after setting up the board each time,
 -- the set-up-board and return-move-string logic can be implemented together as an Aff.
 -- The second parameter, the expected move, is only for board cosmetics. In quiz mode,
@@ -20,3 +18,7 @@ foreign import getMoveImpl :: String -> String -> Effect (Promise String)
 -- For "new puzzle" board cosmetics, give an empty expected move.
 getMove :: FEN -> Move -> Aff Move
 getMove fen expectedMove = toAffE (getMoveImpl fen expectedMove) -- Try to make this point-free later
+
+-- We need this "impl" function since it's easiest to 
+-- import as Effect (Promise _) and then convert it to an Aff.
+foreign import getMoveImpl :: String -> String -> Effect (Promise String)

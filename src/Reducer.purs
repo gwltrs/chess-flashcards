@@ -161,6 +161,7 @@ getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
 getPuzzleByName puzzles name = 
   find (\puzzle -> puzzle.name == name) puzzles
 
+-- See comments for the VarianceFactor type definition 
 updatePuzzles :: Boolean -> Int -> TimestampSeconds -> VarianceFactor -> Array Puzzle -> Maybe (Array Puzzle)
 updatePuzzles isCorrect index now varianceFactor puzzles =
   let

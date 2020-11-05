@@ -72,8 +72,6 @@ handleAction action = do
 
   -- Firing off the rest of the Effects and Affs
   case Tuple action stateAfterAction.view of
-    Tuple NewFile (MainMenu _ _) -> do
-      pure unit
     Tuple (LoadFile _ _) (MainMenu _ _) -> do
       w <- H.liftEffect window
       et <- H.liftEffect (document w <#> toEventTarget)
@@ -117,7 +115,8 @@ expectedMove state = case state.view of
   _ -> 
     ""
 
-nowInSeconds :: Effect Int
+-- Simply converting "now" to the unit of measure we're actually using
+nowInSeconds :: Effect TimestampSeconds
 nowInSeconds = now
   <#> unInstant 
   <#> unwrap

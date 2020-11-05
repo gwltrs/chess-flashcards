@@ -15,11 +15,13 @@ import CSS.Display (display, displayNone)
 -- Second parameter is the contents of the file
 foreign import saveFile :: String -> String -> Effect Unit
 
-foreign import openFileDialogImpl :: Effect (Promise String)
-
 -- The openFileDialogInput HTML element must be rendered before openFileDialog is called
 openFileDialog :: Aff String
 openFileDialog = toAffE openFileDialogImpl
+
+-- We need this "impl" function since it's easiest to 
+-- import as Effect (Promise _) and then convert it to an Aff.
+foreign import openFileDialogImpl :: Effect (Promise String)
 
 -- Necessary for using open file dialog via openFileDialog.
 -- This element is set to "display: none" so it can always be rendered.
