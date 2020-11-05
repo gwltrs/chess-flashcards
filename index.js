@@ -13900,15 +13900,17 @@ var PS = {};
               return name;
           };
           var previousIncrementsRegex = Data_Either.fromRight()(Data_String_Regex.regex("^(\\S.*\\S)\\s+#([1-9][0-9]*)$")(Data_String_Regex_Flags.multiline));
-          var currentIncrement = 1 + Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Ord.max(Data_Ord.ordInt))(1)(Data_Array.mapMaybe(function (nonEmptyArr) {
+          var currentIncrement = 1 + Data_Foldable.foldr(Data_Foldable.foldableArray)(Data_Ord.max(Data_Ord.ordInt))(1)(Data_Functor.mapFlipped(Data_Functor.functorArray)(Data_Array.filter(function (tup) {
+              return Data_Tuple.fst(tup) === name;
+          })(Data_Array.mapMaybe(function (nonEmptyArr) {
               var v = Data_Array_NonEmpty.toArray(nonEmptyArr);
               if (v.length === 3 && (v[0] instanceof Data_Maybe.Just && (v[1] instanceof Data_Maybe.Just && v[2] instanceof Data_Maybe.Just))) {
-                  return Data_Int.fromString(v[2].value0);
+                  return Data_Functor.mapFlipped(Data_Maybe.functorMaybe)(Data_Int.fromString(v[2].value0))(Data_Tuple.Tuple.create(v[1].value0));
               };
               return Data_Maybe.Nothing.value;
           })(Data_Array.mapMaybe(Data_String_Regex.match(previousIncrementsRegex))(Data_Functor.mapFlipped(Data_Functor.functorArray)(puzzles)(function (p) {
               return p.name;
-          })))) | 0;
+          })))))(Data_Tuple.snd)) | 0;
           return name + (" #" + Data_Show.show(Data_Show.showInt)(currentIncrement));
       };
   };
