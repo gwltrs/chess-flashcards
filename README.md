@@ -12,4 +12,4 @@ To use, download or clone this repo and open index.html in Chrome or Firefox. On
 ### Hotkeys
 Underpromotion is handled by keystrokes instead of the typical pop-up window. Immediately before moving the pawn to the promotion square, press the N, B, or R key to underpromote to a knight, a bishop, or a rook, respectively.
 
-When reviewing past puzzles, the Space key can be used instead of clicking the Next button after solving each puzzle.
+When reviewing past puzzles, the Space key can be used instead of clicking the Next button.
