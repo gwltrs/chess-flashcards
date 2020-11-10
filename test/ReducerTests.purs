@@ -227,26 +227,27 @@ reducerTests = suite "Reducer" do
     -- Not testing use case where the move hasn't been made since the 
     -- save button is disabled when the move hasn't been made yet.
     -- Should return user to main menu after saving puzzle.
+    -- Saved puzzle should have the current timestamp
 
     Assert.equal 
-      { puzzles: [ohcPuzzle], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+      { puzzles: [ohcPuzzle { lastDrilledAt = 1_500_000 }], reviewStack: [], view: MainMenu "" "", alert: Nothing }
       (reducer 
         { puzzles: [], reviewStack: [], view: CreatingPuzzle ohcName ohcFEN (Just ohcMove), alert: Nothing }
-        SavePuzzle
+        (SavePuzzle 1_500_000)
       )
 
     Assert.equal 
-      { puzzles: [ohcPuzzle { name = "a" }, endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+      { puzzles: [ohcPuzzle { name = "a", lastDrilledAt = 1_000_000 }, endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: MainMenu "" "", alert: Nothing }
       (reducer 
         { puzzles: [endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: CreatingPuzzle "a" ohcFEN (Just ohcMove), alert: Nothing }
-        SavePuzzle
+        (SavePuzzle 1_000_000)
       )
 
     Assert.equal 
-      { puzzles: [endgamePuzzle1, endgamePuzzle2, ohcPuzzle { name = "z" }], reviewStack: [], view: MainMenu "" "", alert: Nothing }
+      { puzzles: [endgamePuzzle1, endgamePuzzle2, ohcPuzzle { name = "z", lastDrilledAt = 123456789 }], reviewStack: [], view: MainMenu "" "", alert: Nothing }
       (reducer 
         { puzzles: [endgamePuzzle1, endgamePuzzle2], reviewStack: [], view: CreatingPuzzle "z" ohcFEN (Just ohcMove), alert: Nothing }
-        SavePuzzle
+        (SavePuzzle 123456789)
       )
 
   test "User tries to load an invalid file" do

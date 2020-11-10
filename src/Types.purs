@@ -96,7 +96,8 @@ data Action =
   UpdateFEN FEN |
   CreatePuzzle |
   AddMoveToNewPuzzle Move |
-  SavePuzzle |
+  StartSavingPuzzle |
+  SavePuzzle TimestampSeconds |
   BackToMain | 
   Retry | 
   ShowName | 

@@ -48,7 +48,7 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
                 HP.value puzzleName,
                 HP.readOnly true
               ],
-              menuButton Nothing "Save" SavePuzzle (isJust move)
+              menuButton Nothing "Save" StartSavingPuzzle (isJust move)
             ]
         ReviewingPuzzle _ _ _ firstAttempt ->
           HH.div_

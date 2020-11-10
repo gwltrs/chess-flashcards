@@ -55,9 +55,9 @@ reducer state action =
       state { view = MainMenu "" "" }
     Tuple (AddMoveToNewPuzzle move) (CreatingPuzzle name fen _) ->
       state { view = CreatingPuzzle name fen (Just move) }
-    Tuple SavePuzzle (CreatingPuzzle name fen (Just move)) ->
+    Tuple (SavePuzzle currentTimestamp) (CreatingPuzzle name fen (Just move)) ->
       let
-        newPuzzle = { name: name, fen: fen, move: move, box: firstBox, lastDrilledAt: 0 }
+        newPuzzle = { name: name, fen: fen, move: move, box: firstBox, lastDrilledAt: currentTimestamp }
         comparePuzzles l r =
           localeCompare l.name r.name
       in

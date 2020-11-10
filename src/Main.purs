@@ -72,6 +72,9 @@ handleAction action = do
 
   -- Firing off the rest of the Effects and Affs
   case Tuple action stateAfterAction.view of
+    Tuple StartSavingPuzzle (CreatingPuzzle _ _ (Just _)) -> do
+      nowTimestamp <- H.liftEffect nowInSeconds
+      handleAction (SavePuzzle nowTimestamp)
     Tuple (LoadFile _ _) (MainMenu _ _) -> do
       w <- H.liftEffect window
       et <- H.liftEffect (document w <#> toEventTarget)
