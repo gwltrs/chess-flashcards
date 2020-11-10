@@ -8,3 +8,8 @@ Chess Flashcards enables the user to create, add to, and quiz on a repertoire of
 
 ### Getting Started
 To use, download or clone this repo and open index.html in Chrome or Firefox. On the first screen, create a new puzzles data file or load an existing one. Remember to save your file after adding puzzles and/or reviewing previous puzzles. I recommend backing up your puzzles data file somewhere like Google Drive or Github.
+
+### Hotkeys
+Underpromotion is handled by keystrokes instead of the typical pop-up window. Immediately before moving the pawn to the promotion square, press the N, B, or R key to underpromote to a knight, a bishop, or a rook, respectively.
+
+When reviewing past puzzles, the Space key can be used instead of clicking the Next button after solving each puzzle.
