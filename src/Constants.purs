@@ -20,7 +20,7 @@ factorForNextBox :: Int
 factorForNextBox = 2
 
 maxBox :: Days
-maxBox = 64
+maxBox = 128
 
 -- See comments for the VarianceFactor type definition 
 maxVariance :: Number

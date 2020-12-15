@@ -576,20 +576,20 @@ reducerTests = suite "Reducer" do
     Assert.equal 
       { 
         -- The new timestamp is "now" since the variance factor is 0.
-        -- New box should be capped at 64.
-        puzzles: [openGamePuzzle, ohcPuzzle { box = 64, lastDrilledAt = 1_999_447_040 }], 
+        -- New box should be capped at 128.
+        puzzles: [openGamePuzzle, ohcPuzzle { box = 128, lastDrilledAt = 2_000_000_000 }], 
         reviewStack: ["Open Game"], 
         view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
         alert: Nothing
       }
       (reducer 
         { 
-          puzzles: [openGamePuzzle, ohcPuzzle { box = 40 }], 
+          puzzles: [openGamePuzzle, ohcPuzzle { box = 80 }], 
           reviewStack: [ohcName, "Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
-        (AttemptPuzzle ohcMove 2_000_000_000 0.1)
+        (AttemptPuzzle ohcMove 2_000_000_000 0.0)
       )
 
   test "User retries a puzzle" do
