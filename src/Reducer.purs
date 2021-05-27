@@ -27,6 +27,7 @@ import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSec
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
+import DOM (random)
 
 reducer :: State -> Action -> State
 reducer state action =
@@ -147,14 +148,22 @@ incrementName puzzles name =
 -- https://en.wikipedia.org/wiki/Leitner_system 
 generateReviewStack :: TimestampSeconds -> Array Puzzle -> Array Name
 generateReviewStack nowSeconds puzzles =
-  let
-    secondsInADay = 60 * 60 * 24
-  in
-    puzzles
-      <#> (\p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
-      # (filter \tuple -> tuple.overdue > 0)
-      # (sortBy \l r -> compare r.overdue l.overdue)
-      <#> (\tuple2 -> tuple2.name)
+
+  puzzles
+    <#> (\p -> (Tuple (random p.name) p.name))
+    # (sortBy \l r -> compare (fst r) (fst l))
+    <#> snd
+
+  -- MAIN BRANCH LOGIC BELOW
+
+  -- let
+  --   secondsInADay = 60 * 60 * 24
+  -- in
+  --   puzzles
+  --     <#> (\p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
+  --     # (filter \tuple -> tuple.overdue > 0)
+  --     # (sortBy \l r -> compare r.overdue l.overdue)
+  --     <#> (\tuple2 -> tuple2.name)
 
 -- Defined with this param order for convenient use with bind
 getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle

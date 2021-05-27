@@ -9,3 +9,7 @@ exports.click = (idString) => {
     } catch (err) {}
   };
 };
+
+exports.random = (str) => {
+  return Math.random();
+};

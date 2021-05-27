@@ -14,3 +14,5 @@ foreign import eventCode :: Event -> String
 -- Clicks the button with the given id.
 -- Fails silently if the button can't be clicked or doesn't exist.
 foreign import click :: String -> Effect Unit
+
+foreign import random :: String -> Number
