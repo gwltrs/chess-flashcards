@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude (Unit, bind, discard, unit, (*), (/), (==))
+import Prelude (Unit, bind, discard, unit, (/), (==))
 
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Function ((#))
@@ -31,7 +31,7 @@ import Render (render, alertText)
 import Chess (getMove)
 import File (saveFile, openFileDialog)
 import PuzzlesJSON (makePuzzlesJSON)
-import Constants (maxVariance, nextButtonID)
+import Constants (nextButtonID)
 import Clipboard (copyToClipboard)
 import DOM (eventCode, click)
 
@@ -92,12 +92,12 @@ handleAction action = do
       move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
+      handleAction (AttemptPuzzle move nowTimestamp)
     Tuple Retry (ReviewingPuzzle _ fen Nothing _) -> do
       move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
+      handleAction (AttemptPuzzle move nowTimestamp)
     Tuple SaveFile _ -> do
       H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON stateAfterAction.puzzles))
       pure unit

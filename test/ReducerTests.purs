@@ -461,7 +461,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
           alert: Nothing
         }
-        (AttemptPuzzle ohcMove 1601324534 0.5) -- Correct
+        (AttemptPuzzle ohcMove 1601324534) -- Correct
       )
 
     Assert.equal 
@@ -478,7 +478,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
           alert: Nothing
         }
-        (AttemptPuzzle ohcMove 1601324534 0.5) -- Correct
+        (AttemptPuzzle ohcMove 1601324534) -- Correct
       )
 
     Assert.equal 
@@ -495,7 +495,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
           alert: Nothing
         }
-        (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
+        (AttemptPuzzle "d1d7" 1601324534) -- Incorrect
       )
 
     Assert.equal 
@@ -512,7 +512,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
           alert: Nothing
         }
-        (AttemptPuzzle "d1d7" 1601324534 0.5) -- Incorrect
+        (AttemptPuzzle "d1d7" 1601324534) -- Incorrect
       )
 
   test "User makes wrong move on the first attempt" do
@@ -532,7 +532,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
-        (AttemptPuzzle "d1d7" 1_000_000_000 0.0)
+        (AttemptPuzzle "d1d7" 1_000_000_000)
       )
 
     Assert.equal 
@@ -550,7 +550,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing Nothing, 
           alert: Nothing
         }
-        (AttemptPuzzle "a1h8" 2_000_000_000 0.5)
+        (AttemptPuzzle "a1h8" 2_000_000_000)
       )
 
   test "User makes correct move on the first attempt" do
@@ -570,7 +570,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle endgamePuzzle1.name endgamePuzzle1.fen Nothing Nothing, 
           alert: Nothing
         }
-        (AttemptPuzzle endgamePuzzle1.move 1_000_000_000 0.25)
+        (AttemptPuzzle endgamePuzzle1.move 1_000_000_000)
       )
 
     Assert.equal 
@@ -589,7 +589,7 @@ reducerTests = suite "Reducer" do
           view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
           alert: Nothing
         }
-        (AttemptPuzzle ohcMove 2_000_000_000 0.0)
+        (AttemptPuzzle ohcMove 2_000_000_000)
       )
 
   test "User retries a puzzle" do

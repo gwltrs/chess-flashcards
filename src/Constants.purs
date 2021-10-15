@@ -21,7 +21,3 @@ factorForNextBox = 2
 
 maxBox :: Days
 maxBox = 192
-
--- See comments for the VarianceFactor type definition 
-maxVariance :: Number
-maxVariance = 0.1
