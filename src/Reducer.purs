@@ -23,7 +23,7 @@ import Data.Semiring (add, mul)
 import Data.String.Common (localeCompare)
 import Data.Tuple (Tuple(..), fst, snd)
 
-import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds)
+import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor)
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
@@ -83,7 +83,7 @@ reducer state action =
               state { alert = Just AllPuzzlesReviewed }
             _ ->
               state
-    Tuple (AttemptPuzzle move now) (ReviewingPuzzle puzzleName fen Nothing Nothing) ->
+    Tuple (AttemptPuzzle move now varianceFactor) (ReviewingPuzzle puzzleName fen Nothing Nothing) ->
       let
         updateStateReviewStack s = s { reviewStack = s.reviewStack # tail # fromMaybe [] }
         indexInPuzzles = findIndex (\p -> p.name == puzzleName) state.puzzles
@@ -98,14 +98,14 @@ reducer state action =
         }
         updateStatePuzzles s = s { puzzles =
           (lift2 Tuple isCorrect indexInPuzzles)
-            >>= (\tup -> updatePuzzles (fst tup) (snd tup) now s.puzzles)
+            >>= (\tup -> updatePuzzles (fst tup) (snd tup) now varianceFactor s.puzzles)
             # fromMaybe s.puzzles }
       in
         state
           # updateStateView
           # updateStateReviewStack
           # updateStatePuzzles
-    Tuple (AttemptPuzzle move _) (ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt)) ->
+    Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt)) ->
       state { view = ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt) }
     Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt)) ->
       state { view = ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt) }
@@ -161,11 +161,12 @@ getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
 getPuzzleByName puzzles name = 
   find (\puzzle -> puzzle.name == name) puzzles
 
-updatePuzzles :: Boolean -> Int -> TimestampSeconds -> Array Puzzle -> Maybe (Array Puzzle)
-updatePuzzles isCorrect index now puzzles =
+-- See comments for the VarianceFactor type definition 
+updatePuzzles :: Boolean -> Int -> TimestampSeconds -> VarianceFactor -> Array Puzzle -> Maybe (Array Puzzle)
+updatePuzzles isCorrect index now varianceFactor puzzles =
   let
     oldBox = (puzzles !! index) <#> (\p -> p.box) # fromMaybe 1
     newBox = if isCorrect then min maxBox (oldBox * factorForNextBox) else firstBox
-    newTimestamp = now - (newBox # mul secondsInADay # toNumber # round)
+    newTimestamp = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round)
   in
     alterAt index (\p -> Just p { box = newBox, lastDrilledAt = newTimestamp }) puzzles
