@@ -1,6 +1,7 @@
 module Reducer where
 
-import Prelude ((-), (>), compare, (>>=), (*))
+import Prelude
+
 import Control.Apply (lift2)
 import Data.Maybe (Maybe(..), isJust, fromMaybe, isNothing)
 import Data.HeytingAlgebra ((||), not)
@@ -10,9 +11,9 @@ import Data.Array (elemIndex, filter, mapMaybe, sortBy, head, tail, findIndex, (
 import Data.Array.NonEmpty (toArray)
 import Data.Function ((#))
 import Data.Functor ((<#>))
-import Data.String.Regex (regex, match)
+import Data.String.Regex (Regex, regex, match)
 import Data.String.Regex.Flags (multiline)
-import Data.Either (fromRight)
+import Data.Either (Either(..), fromRight)
 import Partial.Unsafe (unsafePartial)
 import Data.Int (fromString, toNumber, round)
 import Data.Foldable (foldr, find)
@@ -27,6 +28,10 @@ import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSec
 import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
+import Utils (unsafeRight)
+
+previousIncrementsRegex :: Regex
+previousIncrementsRegex = unsafeRight $ regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" multiline
 
 reducer :: State -> Action -> State
 reducer state action =
@@ -125,7 +130,7 @@ incrementName puzzles name =
     name
   else
     let
-      previousIncrementsRegex = unsafePartial (fromRight (regex "^(\\S.*\\S)\\s+#([1-9][0-9]*)$" multiline))
+      currentIncrement :: Int
       currentIncrement = puzzles
         <#> (\p -> p.name) 
         # (mapMaybe (match previousIncrementsRegex))

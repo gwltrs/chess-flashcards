@@ -40,7 +40,7 @@ main = HA.runHalogenAff do
   body <- HA.awaitBody
   runUI component unit body
 
-component :: forall q i o m. MonadAff m => H.Component HH.HTML q i o m
+component :: forall q i o m. MonadAff m => H.Component  q i o m
 component =
   H.mkComponent
     { 

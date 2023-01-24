@@ -1,6 +1,6 @@
 "use strict";
 
-exports.fenIsValid = (fen) => {
+export function fenIsValid(fen) {
   /*
    * Here we need a wrapper for the chess.js logic since even the FEN-validation 
    * will throw an exception if not given the right format
@@ -13,7 +13,7 @@ exports.fenIsValid = (fen) => {
   }
 };
 
-exports.sanitizeFEN = (fen) => {
+export function sanitizeFEN(fen) {
   /*
    * Removes move numbers and unnecessary en passant info
    * Behavior is undefined when fenIsValid(fen) === false
@@ -21,7 +21,7 @@ exports.sanitizeFEN = (fen) => {
   return removeMoveNumberFromFEN(removeUnnecessaryEnPassantFromFEN(fen));
 };
 
-exports.getMoveImpl = (fen) => {
+export function getMoveImpl(fen) {
   /*
     * Big ugly function that combines all the needed chessboard.js and chess.js logic
     * into a single promise. I decided to implement this in JS instead of PS since this code

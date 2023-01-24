@@ -1,4 +1,4 @@
-exports.saveFile = function (name) {
+export function saveFile (name) {
   return function (text) {
     return function () {
       const element = document.createElement('a');
@@ -15,7 +15,7 @@ exports.saveFile = function (name) {
   };
 };
 
-exports.openFileDialogImpl = function () {
+export function openFileDialogImpl() {
   return new Promise((res, rej) => {
     const fileInput = document.getElementById("fileInput");
     fileInput.addEventListener("change", handleFiles);

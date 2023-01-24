@@ -1,8 +1,8 @@
-exports.eventCode = (e) => {
+export function eventCode(e) {
   return e.code;
 };
 
-exports.click = (idString) => {
+export function click(idString) {
   return function () {
     try {
       $('#' + idString).click();

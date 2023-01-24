@@ -28,7 +28,7 @@ foreign import openFileDialogImpl :: Effect (Promise String)
 openFileDialogInput :: forall w i. HC.HTML i w
 openFileDialogInput = 
   HH.input [
-    HP.id_ "fileInput",
+    HP.id "fileInput",
     HP.name "name",
     HP.type_ InputFile,
     style do

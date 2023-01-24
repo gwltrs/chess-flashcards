@@ -1,15 +1,13 @@
 module Render where
 
-import Prelude ((>>>), (>>=), (==))
+import Prelude
+
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.HTML.Core as HC
 import Data.Maybe (Maybe(..), isJust, fromMaybe)
-import Data.Semigroup ((<>))
-import Data.Functor ((<#>))
-import Data.Function ((#))
 import Data.Array (singleton, findIndex, (!!))
 
 import Types (Action(..), State, View(..), Alert(..))
@@ -67,20 +65,20 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
       in
         HH.div
           ([
-            HP.id_ "chessboard"
+            HP.id "chessboard"
           ] <> noDisplayClassArray)
           []
 
 menuButton :: forall w i. Maybe String -> String -> w -> Boolean -> HC.HTML i w
 menuButton id text action isEnabled   = 
-  HH.button 
+  HH.button
     (
       [ 
-        HP.class_ (HC.ClassName "menuButton"), 
-        HE.onClick \_ -> Just action,
+        HP.class_ (HC.ClassName "menuButton"),
+        HE.onClick $ const action,
         HP.enabled isEnabled
       ] <> 
-      (id <#> HP.id_ <#> singleton # fromMaybe [])
+      (id <#> HP.id <#> singleton # fromMaybe [])
     )
     [ 
       HH.text text
@@ -92,7 +90,7 @@ menuInput placeholder actionMaker =
     [
       HP.placeholder placeholder,
       HP.class_ (HC.ClassName "textField"),
-      HE.onValueChange (actionMaker >>> Just)
+      HE.onValueChange actionMaker
     ]
 
 alertText :: Alert -> String
