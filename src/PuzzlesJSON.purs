@@ -13,8 +13,7 @@ import Types (Puzzle)
 
 -- Wrapper interfaces for JSON parsing/serialization.
 -- Even though tested lib(s) will likely be imported,
--- defining these first are necessary for implementing
--- roundtrip tests in a TDD sequence (writing tests first).
+-- defining these are for implementing roundtrip tests.
 
 makePuzzlesJSON :: Array Puzzle -> String
 makePuzzlesJSON = makePuzzlesJSONImpl
@@ -39,5 +38,5 @@ parsePuzzlesJSON jsonString =
   case readJSON jsonString of
     Right (r :: Array Puzzle) -> 
       Just r
-    Left err -> 
+    Left _ -> 
       Nothing

@@ -1,6 +1,6 @@
 module Main where
 
-import Prelude (Unit, bind, discard, unit, (*), (/), (==))
+import Prelude
 
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Function ((#))
@@ -14,8 +14,6 @@ import Halogen.HTML as HH
 import Halogen.VDom.Driver (runUI)
 import Web.HTML (window)
 import Web.HTML.Window (alert, document)
-import Control.Applicative (pure)
-import Data.Functor ((<#>))
 import Data.Newtype (unwrap)
 import Data.Int (round)
 import Data.Foldable (find)
@@ -40,17 +38,14 @@ main = HA.runHalogenAff do
   body <- HA.awaitBody
   runUI component unit body
 
-component :: forall q i o m. MonadAff m => H.Component  q i o m
-component =
-  H.mkComponent
-    { 
-      initialState, 
-      render, 
-      eval: H.mkEval H.defaultEval { handleAction = handleAction }
-    }
+component :: forall q i o m. MonadAff m => H.Component q i o m
+component = H.mkComponent { 
+  initialState, 
+  render, 
+  eval: H.mkEval H.defaultEval { handleAction = handleAction }}
 
 initialState :: forall i. i -> State
-initialState _ = { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
+initialState = const { puzzles: [], reviewStack: [], view: LoadingFile, alert: Nothing }
 
 -- Implementing IO/async logic here but delegating pure logic to the reducer
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM State Action () o m Unit
@@ -86,7 +81,6 @@ handleAction action = do
       H.liftEffect (addEventListener keydown el true et)
     Tuple CreatePuzzle (CreatingPuzzle _ fen Nothing) -> do
       move <- H.liftAff (getMove fen "")
-      nowTimestamp <- H.liftEffect nowInSeconds
       handleAction (AddMoveToNewPuzzle move)
     Tuple Review (ReviewingPuzzle _ fen Nothing _) -> do
       move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
@@ -114,7 +108,7 @@ handleAction action = do
 expectedMove :: State -> Move
 expectedMove state = case state.view of
   ReviewingPuzzle puzzleName _ _ _ ->
-    state.puzzles # find (\p -> p.name == puzzleName) <#> (\p -> p.move) # fromMaybe ""
+    state.puzzles # find (\p -> p.name == puzzleName) <#> _.move # fromMaybe ""
   _ -> 
     ""
 
@@ -123,5 +117,5 @@ nowInSeconds :: Effect TimestampSeconds
 nowInSeconds = now
   <#> unInstant 
   <#> unwrap
-  <#> (\x -> x / 1000.0)
+  <#> (_ / 1000.0)
   <#> round

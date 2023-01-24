@@ -52,7 +52,7 @@ reducer state action =
           state { alert = Just MissingNameOrFEN }
         else if not (fenIsValid fen) then 
           state { alert = Just InvalidFEN }
-        else if state.puzzles <#> (\p -> p.fen) # elemIndex sanitizedFEN # isJust then
+        else if state.puzzles <#> _.fen # elemIndex sanitizedFEN # isJust then
           state { alert = Just DuplicateFEN }
         else
           state { view = CreatingPuzzle (incrementName state.puzzles trimmedName) sanitizedFEN Nothing }
@@ -112,9 +112,9 @@ reducer state action =
           # updateStatePuzzles
     Tuple (AttemptPuzzle move _ _) (ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt)) ->
       state { view = ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt) }
-    Tuple Retry (ReviewingPuzzle puzzleName fen (Just move) (Just firstAttempt)) ->
+    Tuple Retry (ReviewingPuzzle puzzleName fen (Just _) (Just firstAttempt)) ->
       state { view = ReviewingPuzzle puzzleName fen Nothing (Just firstAttempt) }
-    Tuple ShowName (ReviewingPuzzle puzzleName _ _ (Just firstAttempt)) -> 
+    Tuple ShowName (ReviewingPuzzle puzzleName _ _ (Just _)) -> 
       state { alert = Just (ThisIsTheName puzzleName) }
     Tuple _ _ ->
       state
@@ -132,7 +132,7 @@ incrementName puzzles name =
     let
       currentIncrement :: Int
       currentIncrement = puzzles
-        <#> (\p -> p.name) 
+        <#> _.name 
         # (mapMaybe (match previousIncrementsRegex))
         # (mapMaybe \nonEmptyArr -> 
             case toArray nonEmptyArr of
@@ -152,14 +152,12 @@ incrementName puzzles name =
 -- https://en.wikipedia.org/wiki/Leitner_system 
 generateReviewStack :: TimestampSeconds -> Array Puzzle -> Array Name
 generateReviewStack nowSeconds puzzles =
-  let
-    secondsInADay = 60 * 60 * 24
-  in
-    puzzles
-      <#> (\p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
-      # (filter \tuple -> tuple.overdue > 0)
-      # (sortBy \l r -> compare r.overdue l.overdue)
-      <#> (\tuple2 -> tuple2.name)
+  let secondsInADay = 60 * 60 * 24
+  in puzzles
+    <#> (\p -> { name: p.name, overdue: nowSeconds - p.lastDrilledAt - (secondsInADay * p.box) })
+    # (filter \tuple -> tuple.overdue > 0)
+    # (sortBy \l r -> compare r.overdue l.overdue)
+    <#> _.name
 
 -- Defined with this param order for convenient use with bind
 getPuzzleByName :: Array Puzzle -> Name -> Maybe Puzzle
@@ -170,7 +168,7 @@ getPuzzleByName puzzles name =
 updatePuzzles :: Boolean -> Int -> TimestampSeconds -> VarianceFactor -> Array Puzzle -> Maybe (Array Puzzle)
 updatePuzzles isCorrect index now varianceFactor puzzles =
   let
-    oldBox = (puzzles !! index) <#> (\p -> p.box) # fromMaybe 1
+    oldBox = (puzzles !! index) <#> _.box # fromMaybe 1
     newBox = if isCorrect then min maxBox (oldBox * factorForNextBox) else firstBox
     newTimestamp = now - (newBox # mul secondsInADay # toNumber # mul varianceFactor # round)
   in

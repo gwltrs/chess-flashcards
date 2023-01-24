@@ -21,42 +21,33 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
     menuDiv = 
       case state.view of
         LoadingFile -> 
-          HH.div_
-            [ 
-              menuButton Nothing "New" NewFile true,
-              menuButton Nothing "Load" OpenFileDialog true
-            ]
+          HH.div_ [ 
+            menuButton Nothing "New" NewFile true,
+            menuButton Nothing "Load" OpenFileDialog true]
         MainMenu _ _ -> 
-          HH.div_
-            [ 
-              menuButton Nothing "Save" SaveFile true,
-              HH.br_,
-              menuButton Nothing "Review" Review true,
-              HH.br_,
-              menuInput "Name" UpdatePuzzleName,
-              menuInput "FEN" UpdateFEN,
-              menuButton Nothing "Create" CreatePuzzle true
-            ]
+          HH.div_ [ 
+            menuButton Nothing "Save" SaveFile true,
+            HH.br_,
+            menuButton Nothing "Review" Review true,
+            HH.br_,
+            menuInput "Name" UpdatePuzzleName,
+            menuInput "FEN" UpdateFEN,
+            menuButton Nothing "Create" CreatePuzzle true]
         CreatingPuzzle puzzleName _ move ->
-          HH.div_
-            [ 
-              menuButton Nothing "Back" BackToMain true,
-              HH.input [
-                HP.class_ (HC.ClassName "label"),
-                HP.value puzzleName,
-                HP.readOnly true
-              ],
-              menuButton Nothing "Save" StartSavingPuzzle (isJust move)
-            ]
+          HH.div_ [ 
+            menuButton Nothing "Back" BackToMain true,
+            HH.input [
+              HP.class_ (HC.ClassName "label"),
+              HP.value puzzleName,
+              HP.readOnly true],
+            menuButton Nothing "Save" StartSavingPuzzle (isJust move)]
         ReviewingPuzzle _ _ _ firstAttempt ->
-          HH.div_
-            [
-              menuButton Nothing "Back" BackToMain true,
-              menuButton Nothing "Retry" Retry (isJust firstAttempt),
-              menuButton (Just nextButtonID) "Next" Review (nextButtonIsEnabled state),
-              menuButton Nothing "Show Name" ShowName (isJust firstAttempt),
-              menuButton Nothing "Copy FEN" CopyFEN (isJust firstAttempt)
-            ]
+          HH.div_ [
+            menuButton Nothing "Back" BackToMain true,
+            menuButton Nothing "Retry" Retry (isJust firstAttempt),
+            menuButton (Just nextButtonID) "Next" Review (nextButtonIsEnabled state),
+            menuButton Nothing "Show Name" ShowName (isJust firstAttempt),
+            menuButton Nothing "Copy FEN" CopyFEN (isJust firstAttempt)]
 
     chessboardDiv :: H.ComponentHTML Action () m
     chessboardDiv = 
@@ -70,28 +61,20 @@ render state = HH.div_ [menuDiv, chessboardDiv, openFileDialogInput]
           []
 
 menuButton :: forall w i. Maybe String -> String -> w -> Boolean -> HC.HTML i w
-menuButton id text action isEnabled   = 
-  HH.button
-    (
-      [ 
-        HP.class_ (HC.ClassName "menuButton"),
-        HE.onClick $ const action,
-        HP.enabled isEnabled
-      ] <> 
-      (id <#> HP.id <#> singleton # fromMaybe [])
-    )
-    [ 
-      HH.text text
-    ]
+menuButton id text action isEnabled = 
+  HH.button ([ 
+    HP.class_ (HC.ClassName "menuButton"),
+    HE.onClick $ const action,
+    HP.enabled isEnabled] <> 
+      (id <#> HP.id <#> singleton # fromMaybe []))
+    [HH.text text]
 
 menuInput :: forall w i. String -> (String -> w) -> HC.HTML i w
 menuInput placeholder actionMaker =
-  HH.input
-    [
-      HP.placeholder placeholder,
-      HP.class_ (HC.ClassName "textField"),
-      HE.onValueChange actionMaker
-    ]
+  HH.input [
+    HP.placeholder placeholder,
+    HP.class_ (HC.ClassName "textField"),
+    HE.onValueChange actionMaker]
 
 alertText :: Alert -> String
 alertText = case _ of

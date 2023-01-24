@@ -5,22 +5,18 @@ import Data.Eq (class Eq)
 import Data.Show (class Show, show)
 import Data.Semigroup ((<>))
 
-type State = 
-  { 
-    puzzles :: Array Puzzle, 
-    reviewStack :: Array Name, -- Names of the puzzles that are up for review
-    view :: View,
-    alert :: Maybe Alert
-  }
+type State = { 
+  puzzles :: Array Puzzle, 
+  reviewStack :: Array Name, -- Names of the puzzles that are up for review
+  view :: View,
+  alert :: Maybe Alert }
 
-type Puzzle = 
-  { 
-    name :: Name,
-    fen :: FEN,
-    move :: Move,
-    box :: Days,
-    lastDrilledAt :: TimestampSeconds
-  }
+type Puzzle = { 
+  name :: Name,
+  fen :: FEN,
+  move :: Move,
+  box :: Days,
+  lastDrilledAt :: TimestampSeconds }
 
 type Name = String
 

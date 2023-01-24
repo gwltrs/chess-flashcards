@@ -18,48 +18,36 @@ renderTests = suite "Render" do
     Assert.equal 
       true
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just true), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
     Assert.equal 
       true
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN (Just ohcMove) (Just false), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
   test "Next button is disabled after user makes incorrect move" do
 
     Assert.equal 
       false
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") (Just true), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
     Assert.equal 
       false
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN (Just "a1h8") (Just false), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
   test "Next button is disabled before before move has been made" do
 
@@ -69,32 +57,23 @@ renderTests = suite "Render" do
     Assert.equal 
       false
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN Nothing Nothing, 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
     Assert.equal 
       false
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just true), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })
 
     Assert.equal 
       false
       (nextButtonIsEnabled 
-        { 
-          puzzles: [openGamePuzzle, ohcPuzzle], 
+        { puzzles: [openGamePuzzle, ohcPuzzle], 
           reviewStack: ["Open Game"], 
           view: ReviewingPuzzle ohcName ohcFEN Nothing (Just false), 
-          alert: Nothing
-        }
-      )
+          alert: Nothing })

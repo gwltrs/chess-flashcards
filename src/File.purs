@@ -1,6 +1,7 @@
 module File where
 
 import Prelude
+
 import Effect (Effect)
 import Control.Promise (Promise, toAffE)
 import Effect.Aff (Aff)
@@ -31,6 +32,4 @@ openFileDialogInput =
     HP.id "fileInput",
     HP.name "name",
     HP.type_ InputFile,
-    style do
-      display displayNone
-  ]
+    style $ display displayNone]

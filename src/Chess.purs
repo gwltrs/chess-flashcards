@@ -1,5 +1,7 @@
 module Chess where
 
+import Prelude
+
 import Effect (Effect)
 import Control.Promise (Promise, toAffE)
 import Effect.Aff (Aff)
@@ -17,7 +19,7 @@ foreign import sanitizeFEN :: String -> String
 -- the board will flash green/red depending if the user move matches the expected move.
 -- For "new puzzle" board cosmetics, give an empty expected move.
 getMove :: FEN -> Move -> Aff Move
-getMove fen expectedMove = toAffE (getMoveImpl fen expectedMove) -- Try to make this point-free later
+getMove fen expectedMove = toAffE $ getMoveImpl fen expectedMove
 
 -- We need this "impl" function since it's easiest to 
 -- import as Effect (Promise _) and then convert it to an Aff.

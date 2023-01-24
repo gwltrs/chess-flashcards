@@ -32,53 +32,43 @@ najdorfFENWithValidEnPassant = "r2q1rk1/3nb1pp/p2p4/1p1PppPn/8/1N2BP2/PPPQ3P/2KR
 
 endgamePuzzle1 :: Puzzle
 endgamePuzzle1 = 
-  { 
-    name: "endgame",
+  { name: "endgame",
     fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
     move: "d7d8n",
     box: 2,
-    lastDrilledAt: 1601324525
-  }
+    lastDrilledAt: 1601324525 }
 
 endgamePuzzle2 :: Puzzle
 endgamePuzzle2 = 
-  { 
-    name: "endgame #2",
+  { name: "endgame #2",
     fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
     move: "g6g7",
     box: 4,
-    lastDrilledAt: 1601324534
-  }
+    lastDrilledAt: 1601324534 }
 
 ohcPuzzle :: Puzzle
-ohcPuzzle = 
-  {
-    name: ohcName,
-    fen: ohcFEN,
-    move: ohcMove,
-    box: firstBox,
-    lastDrilledAt: 0
-  }
+ohcPuzzle = {
+  name: ohcName,
+  fen: ohcFEN,
+  move: ohcMove,
+  box: firstBox,
+  lastDrilledAt: 0 }
 
 openGamePuzzle :: Puzzle
-openGamePuzzle = 
-  {
-    name: "Open Game",
-    fen: openGameFEN,
-    move: "g1f3",
-    box: firstBox,
-    lastDrilledAt: 0
-  }
+openGamePuzzle = {
+  name: "Open Game",
+  fen: openGameFEN,
+  move: "g1f3",
+  box: firstBox,
+  lastDrilledAt: 0 }
 
 largeIncrementPuzzle :: Puzzle
-largeIncrementPuzzle = 
-  {
-    name: "strategy #100",
-    fen: "r4rk1/2qnpp1p/p1p3p1/4N3/P2P4/4P3/5PPP/1R1Q1RK1 w - -",
-    move: "d5d7",
-    box: 4,
-    lastDrilledAt: 1604590319
-  }
+largeIncrementPuzzle = {
+  name: "strategy #100",
+  fen: "r4rk1/2qnpp1p/p1p3p1/4N3/P2P4/4P3/5PPP/1R1Q1RK1 w - -",
+  move: "d5d7",
+  box: 4,
+  lastDrilledAt: 1604590319 }
 
 twoEndgamePuzzles :: Array Puzzle
 twoEndgamePuzzles = [endgamePuzzle1, endgamePuzzle2]
@@ -91,16 +81,13 @@ twoEndgamePuzzlesJSON = """
       fen: "8/2KP1k2/3Pq3/8/8/8/8/8 w - -",
       move: "d7d8n",
       box: 2,
-      lastDrilledAt: 1601324525
-    },
+      lastDrilledAt: 1601324525 },
     { 
       name: "endgame #2",
       fen: "8/5p2/8/6Pk/5P2/8/8/7K w - -",
       move: "g6g7",
       box: 4,
-      lastDrilledAt: 1601324534
-    }
-  ]
+      lastDrilledAt: 1601324534 }]
 """
 
 -- When at 1_000_000_000 TimestampSeconds
@@ -115,30 +102,25 @@ fourAssortedTimestampPuzzlesJSON = """
       "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
       "move": "e2e4",
       "box": 1,
-      "lastDrilledAt": 999910600
-    },
+      "lastDrilledAt": 999910600 },
     { 
       "name": "2",
       "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
       "move": "g1f3",
       "box": 8,
-      "lastDrilledAt": 999307800
-    },
+      "lastDrilledAt": 999307800 },
     { 
       "name": "3",
       "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
       "move": "f1b5",
       "box": 4,
-      "lastDrilledAt": 999655400
-    },
+      "lastDrilledAt": 999655400 },
     { 
       "name": "4",
       "fen": "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
       "move": "d2d3",
       "box": 2,
-      "lastDrilledAt": 999825200
-    }
-  ]
+      "lastDrilledAt": 999825200 }]
 """
 
 fourAssortedTimestampPuzzles :: Array Puzzle
@@ -149,27 +131,22 @@ fourAssortedTimestampPuzzles =
       fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
       move: "e2e4",
       box: 1,
-      lastDrilledAt: 999910600
-    },
+      lastDrilledAt: 999910600 },
     { 
       name: "2",
       fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -",
       move: "g1f3",
       box: 8,
-      lastDrilledAt: 999307800
-    },
+      lastDrilledAt: 999307800 },
     { 
       name: "3",
       fen: "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",
       move: "f1b5",
       box: 4,
-      lastDrilledAt: 999655400
-    },
+      lastDrilledAt: 999655400 },
     { 
       name: "4",
       fen: "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -",
       move: "d2d3",
       box: 2,
-      lastDrilledAt: 999825200
-    }
-  ]
+      lastDrilledAt: 999825200 }]

@@ -25,7 +25,7 @@ export function getMoveImpl(fen) {
   /*
     * Big ugly function that combines all the needed chessboard.js and chess.js logic
     * into a single promise. I decided to implement this in JS instead of PS since this code
-    * was copied and pasted from a previous, well-tested project.
+    * was copied and pasted from a previous, "well-tested" project.
     */
   return function (expectedMove) {
     return function() {
