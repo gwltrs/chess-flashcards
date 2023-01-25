@@ -2,32 +2,21 @@ module Reducer where
 
 import Prelude
 
+import Chess (fenIsValid, sanitizeFEN)
+import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
 import Control.Apply (lift2)
-import Data.Maybe (Maybe(..), isJust, fromMaybe, isNothing)
-import Data.HeytingAlgebra ((||), not)
-import Data.String (trim, length)
-import Data.Eq ((==))
 import Data.Array (elemIndex, filter, mapMaybe, sortBy, head, tail, findIndex, (!!), alterAt)
 import Data.Array.NonEmpty (toArray)
-import Data.Function ((#))
-import Data.Functor ((<#>))
+import Data.Foldable (foldr, find)
+import Data.Int (fromString, toNumber, round)
+import Data.Maybe (Maybe(..), isJust, fromMaybe, isNothing)
+import Data.String (trim, length)
+import Data.String.Common (localeCompare)
 import Data.String.Regex (Regex, regex, match)
 import Data.String.Regex.Flags (multiline)
-import Data.Either (Either(..), fromRight)
-import Partial.Unsafe (unsafePartial)
-import Data.Int (fromString, toNumber, round)
-import Data.Foldable (foldr, find)
-import Data.Ord (max, min)
-import Data.Show (show)
-import Data.Semigroup ((<>))
-import Data.Semiring (add, mul)
-import Data.String.Common (localeCompare)
 import Data.Tuple (Tuple(..), fst, snd)
-
-import Types (Action(..), Alert(..), Puzzle, State, View(..), Name, TimestampSeconds, VarianceFactor)
-import Constants (firstBox, factorForNextBox, maxBox, secondsInADay)
-import Chess (fenIsValid, sanitizeFEN)
 import PuzzlesJSON (parsePuzzlesJSON)
+import Types (Action(..), Alert(..), Name, Puzzle, State, TimestampSeconds, VarianceFactor, View(..))
 import Utils (unsafeRight)
 
 previousIncrementsRegex :: Regex
@@ -63,8 +52,7 @@ reducer state action =
     Tuple (SavePuzzle currentTimestamp) (CreatingPuzzle name fen (Just move)) ->
       let
         newPuzzle = { name: name, fen: fen, move: move, box: firstBox, lastDrilledAt: currentTimestamp }
-        comparePuzzles l r =
-          localeCompare l.name r.name
+        comparePuzzles l r = localeCompare l.name r.name
       in
         state { puzzles = sortBy comparePuzzles (state.puzzles <> [newPuzzle]), view = MainMenu "" "" }
     Tuple (LoadFile fileString currentTimestamp) LoadingFile ->

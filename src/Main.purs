@@ -3,14 +3,12 @@ module Main where
 import Prelude
 
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Function ((#))
 import Effect (Effect)
 import Effect.Now (now)
 import Effect.Aff.Class (class MonadAff)
 import Data.DateTime.Instant (unInstant)
 import Halogen as H
 import Halogen.Aff as HA
-import Halogen.HTML as HH
 import Halogen.VDom.Driver (runUI)
 import Web.HTML (window)
 import Web.HTML.Window (alert, document)
