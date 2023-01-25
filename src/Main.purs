@@ -60,7 +60,7 @@ handleAction action = do
   case stateAfterAction.alert of
     Just alertInState -> do
       w <- H.liftEffect window
-      H.liftEffect (alert (alertText alertInState) w)
+      H.liftEffect $ alert (alertText alertInState) w
       H.modify_ \stateWithAlert -> stateWithAlert { alert = Nothing }
     Nothing ->
       pure unit
@@ -69,38 +69,38 @@ handleAction action = do
   case Tuple action stateAfterAction.view of
     Tuple StartSavingPuzzle (CreatingPuzzle _ _ (Just _)) -> do
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (SavePuzzle nowTimestamp)
+      handleAction $ SavePuzzle nowTimestamp
     Tuple (LoadFile _ _) (MainMenu _ _) -> do
       w <- H.liftEffect window
-      et <- H.liftEffect (document w <#> toEventTarget)
+      et <- H.liftEffect $ document w <#> toEventTarget
       el <- H.liftEffect (eventListener (\e -> 
         if (eventCode e) == "Space" then
           click nextButtonID
         else
           pure unit))
-      H.liftEffect (addEventListener keydown el true et)
+      H.liftEffect $ addEventListener keydown el true et
     Tuple CreatePuzzle (CreatingPuzzle _ fen Nothing) -> do
-      move <- H.liftAff (getMove fen "")
-      handleAction (AddMoveToNewPuzzle move)
+      move <- H.liftAff $ getMove fen ""
+      handleAction $ AddMoveToNewPuzzle move
     Tuple Review (ReviewingPuzzle _ fen Nothing _) -> do
-      move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
+      move <- H.liftAff $ getMove fen $ expectedMove stateAfterAction
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
+      handleAction $ AttemptPuzzle move nowTimestamp $ maxVariance * random0To1
     Tuple Retry (ReviewingPuzzle _ fen Nothing _) -> do
-      move <- H.liftAff (getMove fen (expectedMove stateAfterAction))
+      move <- H.liftAff $ getMove fen $ expectedMove stateAfterAction
       random0To1 <- H.liftEffect random
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (AttemptPuzzle move nowTimestamp (maxVariance * random0To1))
+      handleAction $ AttemptPuzzle move nowTimestamp $ maxVariance * random0To1
     Tuple SaveFile _ -> do
-      H.liftEffect (saveFile "chess-flashcards-data.txt" (makePuzzlesJSON stateAfterAction.puzzles))
+      H.liftEffect $ saveFile "chess-flashcards-data.txt" $ makePuzzlesJSON stateAfterAction.puzzles
       pure unit
     Tuple OpenFileDialog _ -> do
       textInFile <- H.liftAff openFileDialog
       nowTimestamp <- H.liftEffect nowInSeconds
-      handleAction (LoadFile textInFile nowTimestamp)
+      handleAction $ LoadFile textInFile nowTimestamp
     Tuple CopyFEN (ReviewingPuzzle _ fen _ (Just _)) -> do
-      H.liftEffect (copyToClipboard fen)
+      H.liftEffect $ copyToClipboard fen
     _ ->
       pure unit
 

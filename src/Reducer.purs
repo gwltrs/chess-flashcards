@@ -50,7 +50,7 @@ reducer state action =
       in
         if (length trimmedName) == 0 || (length trimmedFEN) == 0 then
           state { alert = Just MissingNameOrFEN }
-        else if not (fenIsValid fen) then 
+        else if not $ fenIsValid fen then
           state { alert = Just InvalidFEN }
         else if state.puzzles <#> _.fen # elemIndex sanitizedFEN # isJust then
           state { alert = Just DuplicateFEN }
